@@ -2,34 +2,34 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Wheel</title>
+<title>Крутим барабан</title>
 
 <style>
-body {
+body{
   margin:0;
   background:#111;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  overflow:hidden;
+  color:white;
   font-family:Arial;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
-.container {
+h1{
+  margin-top:20px;
+}
+
+.container{
   position:relative;
+  margin-top:20px;
 }
 
-.wheel {
-  width:400px;
-  height:400px;
+canvas{
   border-radius:50%;
-  border:10px solid #333;
-  position:relative;
-  transition: transform 5s cubic-bezier(.17,.67,.83,.67);
+  border:8px solid #333;
 }
 
-.arrow {
+.arrow{
   position:absolute;
   left:-40px;
   top:50%;
@@ -41,103 +41,101 @@ body {
   border-right:30px solid white;
 }
 
-button {
-  position:absolute;
-  bottom:-70px;
-  left:50%;
-  transform:translateX(-50%);
-  padding:10px 20px;
-  font-size:18px;
-  cursor:pointer;
+.controls{
+  margin-top:20px;
 }
 
-@keyframes idleSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+input{
+  padding:8px;
+  font-size:16px;
+}
+
+button{
+  padding:8px 15px;
+  font-size:16px;
+  cursor:pointer;
+  margin-left:5px;
+}
+
+@keyframes idleSpin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
 }
 </style>
 </head>
 <body>
 
+<h1>🎯 Крутим барабан</h1>
+
 <div class="container">
   <div class="arrow"></div>
-  <canvas id="wheelCanvas" class="wheel" width="400" height="400"></canvas>
+  <canvas id="wheel" width="400" height="400"></canvas>
+</div>
+
+<div class="controls">
+  <input type="text" id="nameInput" placeholder="Введите имя">
+  <button onclick="addName()">Добавить</button>
   <button onclick="spin()">Крутить</button>
 </div>
 
-<!-- Звуки -->
-<audio id="spinSound" src="https://www.soundjay.com/mechanical/sounds/spin-1.mp3"></audio>
-<audio id="clickSound" src="https://www.soundjay.com/mechanical/sounds/click-1.mp3"></audio>
-<audio id="applauseSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
-
 <script>
-const canvas = document.getElementById("wheelCanvas");
+const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
-const segments = ["1", "2", "3", "4", "5", "6"];
-const colors = ["#ff4d4d","#4dff4d","#4d4dff","#ffff4d","#ff4dff","#4dffff"];
+let names = ["Игрок 1","Игрок 2","Игрок 3","Игрок 4","Игрок 5","Игрок 6","Игрок 7","Игрок 8"];
 
-const spinSound = document.getElementById("spinSound");
-const clickSound = document.getElementById("clickSound");
-const applauseSound = document.getElementById("applauseSound");
-
+const colors = ["#ff0000","#ffff00","#0000ff","#00ff00"];
 let angle = 0;
 let spinning = false;
 
 function drawWheel(){
-  const arc = Math.PI * 2 / segments.length;
+  ctx.clearRect(0,0,400,400);
+  const arc = 2*Math.PI / names.length;
 
-  for(let i=0;i<segments.length;i++){
+  for(let i=0;i<names.length;i++){
     ctx.beginPath();
-    ctx.fillStyle = colors[i];
+    ctx.fillStyle = colors[i % colors.length];
     ctx.moveTo(200,200);
-    ctx.arc(200,200,200, arc*i, arc*(i+1));
+    ctx.arc(200,200,200,arc*i,arc*(i+1));
     ctx.fill();
 
     ctx.save();
     ctx.translate(200,200);
     ctx.rotate(arc*i + arc/2);
-    ctx.fillStyle = "#000";
-    ctx.font = "20px Arial";
-    ctx.fillText(segments[i], 130,10);
+    ctx.fillStyle="black";
+    ctx.font="16px Arial";
+    ctx.fillText(names[i],120,5);
     ctx.restore();
   }
 }
 
 drawWheel();
 
-// Автокрутка при загрузке
-canvas.style.animation = "idleSpin 20s linear infinite";
+canvas.style.animation="idleSpin 25s linear infinite";
+
+function addName(){
+  const input = document.getElementById("nameInput");
+  if(input.value.trim()==="") return;
+  names.push(input.value.trim());
+  input.value="";
+  drawWheel();
+}
 
 function spin(){
   if(spinning) return;
+  spinning=true;
 
-  spinning = true;
-  canvas.style.animation = "none";
-
-  spinSound.play();
+  canvas.style.animation="none";
 
   let spins = 5 + Math.random()*5;
-  let finalAngle = spins * 360;
+  angle += spins*360;
 
-  angle += finalAngle;
-
-  canvas.style.transform = `rotate(${angle}deg)`;
-
-  // щелчки
-  let clickInterval = setInterval(()=>{
-    clickSound.currentTime = 0;
-    clickSound.play();
-  }, 150);
+  canvas.style.transition="transform 5s cubic-bezier(.17,.67,.83,.67)";
+  canvas.style.transform=`rotate(${angle}deg)`;
 
   setTimeout(()=>{
-    clearInterval(clickInterval);
-    spinSound.pause();
-    applauseSound.play();
-    spinning = false;
-
-    canvas.style.animation = "idleSpin 20s linear infinite";
-
+    spinning=false;
+    canvas.style.animation="idleSpin 25s linear infinite";
   },5000);
 }
 </script>

@@ -11,33 +11,23 @@ body{
   color:white;
   font-family:Arial;
   display:flex;
-  height:100vh;
 }
 
-/* Левая панель */
 .sidebar{
-  width:250px;
-  background:rgba(255,255,255,0.08);
-  backdrop-filter:blur(6px);
+  width:260px;
+  background:rgba(255,255,255,0.07);
   padding:20px;
-  box-sizing:border-box;
-}
-
-.sidebar h2{
-  margin-top:0;
 }
 
 .sidebar input{
   width:100%;
   padding:8px;
   margin-bottom:10px;
-  font-size:14px;
 }
 
 .sidebar button{
   width:100%;
   padding:8px;
-  margin-bottom:10px;
   cursor:pointer;
 }
 
@@ -73,11 +63,6 @@ h1{
   border-bottom:15px solid transparent;
   border-right:30px solid white;
 }
-
-canvas{
-  border-radius:50%;
-  border:8px solid #333;
-}
 </style>
 </head>
 <body>
@@ -109,7 +94,7 @@ const ctx = canvas.getContext("2d");
 let names = ["Игрок 1","Игрок 2","Игрок 3","Игрок 4","Игрок 5","Игрок 6","Игрок 7","Игрок 8"];
 const colors = ["#ff0000","#ffff00","#0000ff","#00ff00"];
 
-let currentAngle = 0;
+let angle = 0;
 let spinning = false;
 
 function updateList(){
@@ -126,14 +111,14 @@ function drawWheel(){
 
   for(let i=0;i<names.length;i++){
     ctx.beginPath();
-    ctx.fillStyle = colors[i % colors.length];
     ctx.moveTo(200,200);
-    ctx.arc(200,200,200,arc*i,arc*(i+1));
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.arc(200,200,200,arc*i+angle,arc*(i+1)+angle);
     ctx.fill();
 
     ctx.save();
     ctx.translate(200,200);
-    ctx.rotate(arc*i + arc/2);
+    ctx.rotate(arc*i + arc/2 + angle);
     ctx.fillStyle="black";
     ctx.font="16px Arial";
     ctx.fillText(names[i],120,5);
@@ -141,48 +126,42 @@ function drawWheel(){
   }
 }
 
+function spin(){
+  if(spinning) return;
+  spinning = true;
+
+  let velocity = 0.3 + Math.random()*0.3;
+
+  function animate(){
+    angle += velocity;
+    velocity *= 0.98;
+
+    drawWheel();
+
+    if(velocity > 0.002){
+      requestAnimationFrame(animate);
+    } else {
+      spinning = false;
+      showWinner();
+    }
+  }
+
+  animate();
+}
+
+function showWinner(){
+  const arc = 2*Math.PI / names.length;
+  let index = Math.floor((Math.PI*2 - angle % (Math.PI*2)) / arc) % names.length;
+  alert("Победитель: " + names[index]);
+}
+
 function addName(){
-  const input=document.getElementById("nameInput");
+  const input = document.getElementById("nameInput");
   if(input.value.trim()==="") return;
   names.push(input.value.trim());
   input.value="";
   updateList();
   drawWheel();
-}
-
-function spin(){
-  if(spinning) return;
-  spinning=true;
-
-  let spinTime = 4000;
-  let start = null;
-  let startAngle = currentAngle;
-  let extraRotation = 360*5 + Math.random()*360;
-
-  function animate(timestamp){
-    if(!start) start = timestamp;
-    let progress = timestamp - start;
-    let ease = 1 - Math.pow(1 - progress/spinTime, 3);
-
-    currentAngle = startAngle + extraRotation * ease;
-    canvas.style.transform = `rotate(${currentAngle}deg)`;
-
-    if(progress < spinTime){
-      requestAnimationFrame(animate);
-    } else {
-      spinning=false;
-      showWinner();
-    }
-  }
-
-  requestAnimationFrame(animate);
-}
-
-function showWinner(){
-  const arc = 360 / names.length;
-  let normalized = currentAngle % 360;
-  let index = Math.floor((360 - normalized) / arc) % names.length;
-  alert("Победитель: " + names[index]);
 }
 
 updateList();

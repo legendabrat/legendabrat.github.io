@@ -11,22 +11,55 @@ body{
   color:white;
   font-family:Arial;
   display:flex;
+  height:100vh;
+}
+
+/* Левая панель */
+.sidebar{
+  width:250px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(6px);
+  padding:20px;
+  box-sizing:border-box;
+}
+
+.sidebar h2{
+  margin-top:0;
+}
+
+.sidebar input{
+  width:100%;
+  padding:8px;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+.sidebar button{
+  width:100%;
+  padding:8px;
+  margin-bottom:10px;
+  cursor:pointer;
+}
+
+.nameList{
+  margin-top:15px;
+  font-size:14px;
+}
+
+.main{
+  flex:1;
+  display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:center;
 }
 
 h1{
-  margin-top:20px;
+  margin-bottom:20px;
 }
 
 .container{
   position:relative;
-  margin-top:20px;
-}
-
-canvas{
-  border-radius:50%;
-  border:8px solid #333;
 }
 
 .arrow{
@@ -41,41 +74,32 @@ canvas{
   border-right:30px solid white;
 }
 
-.controls{
-  margin-top:20px;
-}
-
-input{
-  padding:8px;
-  font-size:16px;
-}
-
-button{
-  padding:8px 15px;
-  font-size:16px;
-  cursor:pointer;
-  margin-left:5px;
-}
-
-@keyframes idleSpin{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
+canvas{
+  border-radius:50%;
+  border:8px solid #333;
 }
 </style>
 </head>
 <body>
 
-<h1>🎯 Крутим барабан</h1>
-
-<div class="container">
-  <div class="arrow"></div>
-  <canvas id="wheel" width="400" height="400"></canvas>
-</div>
-
-<div class="controls">
+<div class="sidebar">
+  <h2>Имена</h2>
   <input type="text" id="nameInput" placeholder="Введите имя">
   <button onclick="addName()">Добавить</button>
-  <button onclick="spin()">Крутить</button>
+  <div class="nameList" id="nameList"></div>
+</div>
+
+<div class="main">
+  <h1>🎯 Крутим барабан</h1>
+
+  <div class="container">
+    <div class="arrow"></div>
+    <canvas id="wheel" width="400" height="400"></canvas>
+  </div>
+
+  <button style="margin-top:20px;padding:10px 20px;font-size:18px;" onclick="spin()">
+    Крутить
+  </button>
 </div>
 
 <script>
@@ -83,10 +107,18 @@ const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
 let names = ["Игрок 1","Игрок 2","Игрок 3","Игрок 4","Игрок 5","Игрок 6","Игрок 7","Игрок 8"];
-
 const colors = ["#ff0000","#ffff00","#0000ff","#00ff00"];
-let angle = 0;
+
+let currentAngle = 0;
 let spinning = false;
+
+function updateList(){
+  const list = document.getElementById("nameList");
+  list.innerHTML="";
+  names.forEach(n=>{
+    list.innerHTML += n + "<br>";
+  });
+}
 
 function drawWheel(){
   ctx.clearRect(0,0,400,400);
@@ -109,15 +141,12 @@ function drawWheel(){
   }
 }
 
-drawWheel();
-
-canvas.style.animation="idleSpin 25s linear infinite";
-
 function addName(){
-  const input = document.getElementById("nameInput");
+  const input=document.getElementById("nameInput");
   if(input.value.trim()==="") return;
   names.push(input.value.trim());
   input.value="";
+  updateList();
   drawWheel();
 }
 
@@ -125,19 +154,39 @@ function spin(){
   if(spinning) return;
   spinning=true;
 
-  canvas.style.animation="none";
+  let spinTime = 4000;
+  let start = null;
+  let startAngle = currentAngle;
+  let extraRotation = 360*5 + Math.random()*360;
 
-  let spins = 5 + Math.random()*5;
-  angle += spins*360;
+  function animate(timestamp){
+    if(!start) start = timestamp;
+    let progress = timestamp - start;
+    let ease = 1 - Math.pow(1 - progress/spinTime, 3);
 
-  canvas.style.transition="transform 5s cubic-bezier(.17,.67,.83,.67)";
-  canvas.style.transform=`rotate(${angle}deg)`;
+    currentAngle = startAngle + extraRotation * ease;
+    canvas.style.transform = `rotate(${currentAngle}deg)`;
 
-  setTimeout(()=>{
-    spinning=false;
-    canvas.style.animation="idleSpin 25s linear infinite";
-  },5000);
+    if(progress < spinTime){
+      requestAnimationFrame(animate);
+    } else {
+      spinning=false;
+      showWinner();
+    }
+  }
+
+  requestAnimationFrame(animate);
 }
+
+function showWinner(){
+  const arc = 360 / names.length;
+  let normalized = currentAngle % 360;
+  let index = Math.floor((360 - normalized) / arc) % names.length;
+  alert("Победитель: " + names[index]);
+}
+
+updateList();
+drawWheel();
 </script>
 
 </body>

@@ -13,6 +13,7 @@ body{
   display:flex;
 }
 
+/* Левая панель */
 .sidebar{
   width:260px;
   background:rgba(255,255,255,0.06);
@@ -30,14 +31,21 @@ body{
   background:rgba(255,255,255,0.1);
   border:none;
   color:white;
+  font-size:14px;
 }
 
+/* Центр */
 .main{
   flex:1;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
+}
+
+h1{
+  margin-bottom:20px;
+  font-weight:500;
 }
 
 .container{
@@ -58,26 +66,37 @@ body{
 
 canvas{
   border-radius:50%;
+  box-shadow:0 0 40px rgba(0,0,0,0.7);
 }
 
 button{
   margin-top:20px;
-  padding:10px 20px;
+  padding:12px 30px;
   font-size:18px;
+  border:none;
+  border-radius:12px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
 }
 
-/* Плашка */
+button:hover{
+  background:#1d4ed8;
+}
+
+/* Плашка победителя */
 #winnerBox{
   position:fixed;
   top:50%;
   left:50%;
-  transform:translate(-50%,-50%) scale(0.8);
-  background:#1c1c1c;
-  padding:30px 70px;
-  border-radius:20px;
+  transform:translate(-50%,-50%) scale(0.7);
+  background:linear-gradient(145deg,#1c1c1c,#111);
+  padding:50px 120px;
+  border-radius:30px;
   text-align:center;
+  box-shadow:0 40px 120px rgba(0,0,0,0.9);
   opacity:0;
-  transition:0.3s ease;
+  transition:0.35s cubic-bezier(.2,.8,.2,1);
 }
 
 #winnerBox.show{
@@ -86,16 +105,24 @@ button{
 }
 
 #winnerBox .title{
-  font-size:18px;
-  letter-spacing:3px;
+  font-size:20px;
+  letter-spacing:4px;
   opacity:0.7;
+  margin-bottom:20px;
 }
 
 #winnerBox .name{
-  font-size:44px;
-  font-weight:bold;
-  margin-top:10px;
-  color:#f1c40f;
+  font-size:60px;
+  font-weight:800;
+  background:linear-gradient(90deg,#ffd700,#ff8c00);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow{
+  from{ text-shadow:0 0 15px rgba(255,215,0,0.5);}
+  to{ text-shadow:0 0 35px rgba(255,140,0,1);}
 }
 </style>
 </head>
@@ -129,6 +156,8 @@ button{
   <div class="title">ПОБЕДИТЕЛЬ</div>
   <div class="name" id="winnerName"></div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
 const canvas = document.getElementById("wheel");
@@ -177,11 +206,11 @@ function spin(){
   if(spinning) return;
   spinning=true;
 
-  let velocity=0.45;
+  let velocity=0.5 + Math.random()*0.2;
 
   function animate(){
     angle+=velocity;
-    velocity*=0.991;
+    velocity*=0.992;
 
     drawWheel();
 
@@ -207,9 +236,19 @@ function showWinner(){
   winnerNameEl.textContent=names[index];
   winnerBox.classList.add("show");
 
+  // Салют
+  const duration = 2500;
+  const end = Date.now() + duration;
+
+  (function frame() {
+    confetti({particleCount:6, angle:60, spread:70, origin:{x:0}});
+    confetti({particleCount:6, angle:120, spread:70, origin:{x:1}});
+    if (Date.now() < end) requestAnimationFrame(frame);
+  })();
+
   setTimeout(()=>{
     winnerBox.classList.remove("show");
-  },4000);
+  },4500);
 }
 
 document.querySelectorAll(".nameInput").forEach(input=>{

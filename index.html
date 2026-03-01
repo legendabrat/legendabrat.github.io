@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <title>Крутим барабан</title>
 
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
 <style>
 body{
   margin:0;
@@ -13,15 +17,10 @@ body{
   display:flex;
 }
 
-/* Левая панель */
 .sidebar{
   width:260px;
   background:rgba(255,255,255,0.06);
   padding:20px;
-}
-
-.sidebar h2{
-  margin-top:0;
 }
 
 .nameInput{
@@ -35,7 +34,6 @@ body{
   outline:none;
 }
 
-/* Центр */
 .main{
   flex:1;
   display:flex;
@@ -64,13 +62,54 @@ h1{
   border-bottom:15px solid transparent;
   border-right:30px solid white;
 }
+
+/* Баннер победителя */
+#winnerOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:0.4s;
+}
+
+#winnerBox{
+  background:#1f1f1f;
+  padding:40px 60px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 0 40px rgba(0,0,0,0.6);
+  transform:scale(0.7);
+  transition:0.4s;
+}
+
+#winnerOverlay.active{
+  opacity:1;
+  pointer-events:auto;
+}
+
+#winnerOverlay.active #winnerBox{
+  transform:scale(1);
+}
+
+#winnerName{
+  font-size:32px;
+  margin-top:10px;
+  color:#f1c40f;
+}
+canvas{
+  border-radius:50%;
+  border:8px solid #333;
+}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
   <h2>Имена</h2>
-
   <input class="nameInput" id="n0" placeholder="Игрок 1">
   <input class="nameInput" id="n1" placeholder="Игрок 2">
   <input class="nameInput" id="n2" placeholder="Игрок 3">
@@ -79,7 +118,6 @@ h1{
   <input class="nameInput" id="n5" placeholder="Игрок 6">
   <input class="nameInput" id="n6" placeholder="Игрок 7">
   <input class="nameInput" id="n7" placeholder="Игрок 8">
-
 </div>
 
 <div class="main">
@@ -95,19 +133,33 @@ h1{
   </button>
 </div>
 
+<!-- Оверлей -->
+<div id="winnerOverlay">
+  <div id="winnerBox">
+    🎉 Победитель 🎉
+    <div id="winnerName"></div>
+    <br><br>
+    <button onclick="closeWinner()" style="padding:8px 20px;">Ок</button>
+  </div>
+</div>
+
+<!-- Конфетти -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<!-- Аплодисменты -->
+<audio id="applause" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1a75.mp3?filename=applause-2-6844.mp3"></audio>
+
 <script>
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
+const overlay = document.getElementById("winnerOverlay");
+const winnerNameEl = document.getElementById("winnerName");
+const applause = document.getElementById("applause");
 
 let angle = 0;
 let spinning = false;
 
-const colors = [
-  "#e74c3c",   // мягкий красный
-  "#f1c40f",   // желтый
-  "#3498db",   // мягкий синий
-  "#2ecc71"    // зеленый
-];
+const colors = ["#e74c3c","#f1c40f","#3498db","#2ecc71"];
 
 function getNames(){
   let arr=[];
@@ -120,7 +172,6 @@ function getNames(){
 
 function drawWheel(){
   const names = getNames();
-
   ctx.clearRect(0,0,420,420);
   const arc = 2*Math.PI / names.length;
 
@@ -144,20 +195,19 @@ function drawWheel(){
 
 function spin(){
   if(spinning) return;
-  spinning = true;
+  spinning=true;
 
   let velocity = 0.35 + Math.random()*0.25;
 
   function animate(){
     angle += velocity;
     velocity *= 0.985;
-
     drawWheel();
 
     if(velocity > 0.002){
       requestAnimationFrame(animate);
     } else {
-      spinning = false;
+      spinning=false;
       showWinner();
     }
   }
@@ -169,10 +219,25 @@ function showWinner(){
   const names = getNames();
   const arc = 2*Math.PI / names.length;
   let index = Math.floor((Math.PI*2 - angle % (Math.PI*2)) / arc) % names.length;
-  alert("Победитель: " + names[index]);
+  let winner = names[index];
+
+  winnerNameEl.textContent = winner;
+  overlay.classList.add("active");
+
+  applause.currentTime = 0;
+  applause.play();
+
+  confetti({
+    particleCount:150,
+    spread:90,
+    origin:{ y:0.6 }
+  });
 }
 
-/* Авто перерисовка при вводе */
+function closeWinner(){
+  overlay.classList.remove("active");
+}
+
 document.querySelectorAll(".nameInput").forEach(input=>{
   input.addEventListener("input", drawWheel);
 });

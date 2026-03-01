@@ -17,10 +17,15 @@ body{
   display:flex;
 }
 
+/* ЛЕВАЯ ПАНЕЛЬ */
 .sidebar{
   width:260px;
-  background:rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.05);
   padding:20px;
+}
+
+.sidebar h2{
+  margin-top:0;
 }
 
 .nameInput{
@@ -34,6 +39,7 @@ body{
   outline:none;
 }
 
+/* ОСНОВНАЯ ЧАСТЬ */
 .main{
   flex:1;
   display:flex;
@@ -63,46 +69,47 @@ h1{
   border-right:30px solid white;
 }
 
-/* Баннер победителя */
-#winnerOverlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  pointer-events:none;
-  transition:0.4s;
-}
-
-#winnerBox{
-  background:#1f1f1f;
-  padding:40px 60px;
-  border-radius:20px;
-  text-align:center;
-  box-shadow:0 0 40px rgba(0,0,0,0.6);
-  transform:scale(0.7);
-  transition:0.4s;
-}
-
-#winnerOverlay.active{
-  opacity:1;
-  pointer-events:auto;
-}
-
-#winnerOverlay.active #winnerBox{
-  transform:scale(1);
-}
-
-#winnerName{
-  font-size:32px;
-  margin-top:10px;
-  color:#f1c40f;
-}
 canvas{
   border-radius:50%;
   border:8px solid #333;
+}
+
+/* ПЛАШКА ПОБЕДИТЕЛЯ */
+#winnerBox{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0.8);
+  background:#1c1c1c;
+  padding:70px 120px;
+  border-radius:30px;
+  text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,0.8);
+  opacity:0;
+  pointer-events:none;
+  transition:0.4s ease;
+}
+
+#winnerBox.active{
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(-50%,-50%) scale(1);
+}
+
+#winnerTitle{
+  font-size:28px;
+  letter-spacing:2px;
+  opacity:0.8;
+}
+
+#winnerName{
+  font-size:56px;
+  margin-top:20px;
+  font-weight:700;
+  font-family:'Trebuchet MS','Segoe UI',sans-serif;
+  background:linear-gradient(90deg,#f1c40f,#e67e22);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
 </style>
 </head>
@@ -128,21 +135,19 @@ canvas{
     <canvas id="wheel" width="420" height="420"></canvas>
   </div>
 
-  <button style="margin-top:20px;padding:10px 20px;font-size:18px;" onclick="spin()">
+  <button style="margin-top:20px;padding:10px 25px;font-size:18px;border-radius:8px;border:none;cursor:pointer;" onclick="spin()">
     Крутить
   </button>
 </div>
 
-<!-- Оверлей -->
-<div id="winnerOverlay">
-  <div id="winnerBox">
-  🎉 ПОБЕДИТЕЛЬ 🎉
+<!-- ПЛАШКА -->
+<div id="winnerBox">
+  <div id="winnerTitle">ПОБЕДИТЕЛЬ</div>
   <div id="winnerName"></div>
-  <br>
+  <br><br>
   <button onclick="closeWinner()" style="padding:10px 30px;font-size:16px;border:none;border-radius:8px;cursor:pointer;">
     Закрыть
   </button>
-</div>
 </div>
 
 <!-- Конфетти -->
@@ -154,7 +159,7 @@ canvas{
 <script>
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
-const overlay = document.getElementById("winnerOverlay");
+const winnerBox = document.getElementById("winnerBox");
 const winnerNameEl = document.getElementById("winnerName");
 const applause = document.getElementById("applause");
 
@@ -220,24 +225,28 @@ function spin(){
 function showWinner(){
   const names = getNames();
   const arc = 2*Math.PI / names.length;
-  let index = Math.floor((Math.PI*2 - angle % (Math.PI*2)) / arc) % names.length;
+
+  let pointerAngle = Math.PI; 
+  let normalized = (angle + pointerAngle) % (Math.PI*2);
+  let index = Math.floor((Math.PI*2 - normalized) / arc) % names.length;
+
   let winner = names[index];
 
   winnerNameEl.textContent = winner;
-  overlay.classList.add("active");
+  winnerBox.classList.add("active");
 
   applause.currentTime = 0;
   applause.play();
 
   confetti({
-    particleCount:150,
-    spread:90,
+    particleCount:180,
+    spread:100,
     origin:{ y:0.6 }
   });
 }
 
 function closeWinner(){
-  overlay.classList.remove("active");
+  winnerBox.classList.remove("active");
 }
 
 document.querySelectorAll(".nameInput").forEach(input=>{

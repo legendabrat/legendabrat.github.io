@@ -1,23 +1,81 @@
-<!-- Плашка победителя -->
-<div id="winnerBox">
-  <div class="title">ПОБЕДИТЕЛЬ</div>
-  <div class="name" id="winnerName"></div>
-</div>
-
-<!-- Салют -->
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Крутим барабан</title>
 
 <style>
+body{
+  margin:0;
+  background:#111;
+  color:white;
+  font-family:'Segoe UI',sans-serif;
+  display:flex;
+}
+
+.sidebar{
+  width:260px;
+  background:rgba(255,255,255,0.06);
+  padding:20px;
+}
+
+.sidebar h2{
+  margin-top:0;
+}
+
+.nameInput{
+  width:100%;
+  padding:8px;
+  margin-bottom:8px;
+  background:rgba(255,255,255,0.1);
+  border:none;
+  color:white;
+}
+
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.container{
+  position:relative;
+}
+
+.arrow{
+  position:absolute;
+  left:-40px;
+  top:50%;
+  transform:translateY(-50%) rotate(180deg);
+  width:0;
+  height:0;
+  border-top:15px solid transparent;
+  border-bottom:15px solid transparent;
+  border-right:30px solid white;
+}
+
+canvas{
+  border-radius:50%;
+}
+
+button{
+  margin-top:20px;
+  padding:10px 20px;
+  font-size:18px;
+}
+
+/* Плашка */
 #winnerBox{
   position:fixed;
   top:50%;
   left:50%;
-  transform:translate(-50%,-50%) scale(0.85);
+  transform:translate(-50%,-50%) scale(0.8);
   background:#1c1c1c;
   padding:30px 70px;
-  border-radius:24px;
+  border-radius:20px;
   text-align:center;
-  box-shadow:0 25px 70px rgba(0,0,0,0.8);
   opacity:0;
   transition:0.3s ease;
 }
@@ -31,15 +89,135 @@
   font-size:18px;
   letter-spacing:3px;
   opacity:0.7;
-  margin-bottom:15px;
 }
 
 #winnerBox .name{
-  font-size:46px;
-  font-weight:700;
-  font-family:'Trebuchet MS','Segoe UI',sans-serif;
-  background:linear-gradient(90deg,#f1c40f,#ff8c00);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+  font-size:44px;
+  font-weight:bold;
+  margin-top:10px;
+  color:#f1c40f;
 }
 </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>Имена</h2>
+  <input class="nameInput" id="n0" placeholder="Игрок 1">
+  <input class="nameInput" id="n1" placeholder="Игрок 2">
+  <input class="nameInput" id="n2" placeholder="Игрок 3">
+  <input class="nameInput" id="n3" placeholder="Игрок 4">
+  <input class="nameInput" id="n4" placeholder="Игрок 5">
+  <input class="nameInput" id="n5" placeholder="Игрок 6">
+  <input class="nameInput" id="n6" placeholder="Игрок 7">
+  <input class="nameInput" id="n7" placeholder="Игрок 8">
+</div>
+
+<div class="main">
+  <h1>🎯 Крутим барабан</h1>
+
+  <div class="container">
+    <div class="arrow"></div>
+    <canvas id="wheel" width="420" height="420"></canvas>
+  </div>
+
+  <button onclick="spin()">Крутить</button>
+</div>
+
+<div id="winnerBox">
+  <div class="title">ПОБЕДИТЕЛЬ</div>
+  <div class="name" id="winnerName"></div>
+</div>
+
+<script>
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const winnerBox = document.getElementById("winnerBox");
+const winnerNameEl = document.getElementById("winnerName");
+
+let angle = 0;
+let spinning = false;
+
+const colors = ["#e74c3c","#f1c40f","#3498db","#2ecc71"];
+
+function getNames(){
+  let arr=[];
+  for(let i=0;i<8;i++){
+    let val=document.getElementById("n"+i).value.trim();
+    arr.push(val==="" ? "Игрок "+(i+1) : val);
+  }
+  return arr;
+}
+
+function drawWheel(){
+  const names=getNames();
+  ctx.clearRect(0,0,420,420);
+  const arc=2*Math.PI/names.length;
+
+  for(let i=0;i<names.length;i++){
+    ctx.beginPath();
+    ctx.moveTo(210,210);
+    ctx.fillStyle=colors[i%colors.length];
+    ctx.arc(210,210,210,arc*i+angle,arc*(i+1)+angle);
+    ctx.fill();
+
+    ctx.save();
+    ctx.translate(210,210);
+    ctx.rotate(arc*i+arc/2+angle);
+    ctx.fillStyle="white";
+    ctx.font="18px Segoe UI";
+    ctx.textAlign="right";
+    ctx.fillText(names[i],170,5);
+    ctx.restore();
+  }
+}
+
+function spin(){
+  if(spinning) return;
+  spinning=true;
+
+  let velocity=0.45;
+
+  function animate(){
+    angle+=velocity;
+    velocity*=0.991;
+
+    drawWheel();
+
+    if(velocity>0.002){
+      requestAnimationFrame(animate);
+    }else{
+      spinning=false;
+      showWinner();
+    }
+  }
+
+  animate();
+}
+
+function showWinner(){
+  const names=getNames();
+  const arc=2*Math.PI/names.length;
+
+  let pointerAngle=Math.PI;
+  let normalized=(angle+pointerAngle)%(2*Math.PI);
+  let index=Math.floor((2*Math.PI-normalized)/arc)%names.length;
+
+  winnerNameEl.textContent=names[index];
+  winnerBox.classList.add("show");
+
+  setTimeout(()=>{
+    winnerBox.classList.remove("show");
+  },4000);
+}
+
+document.querySelectorAll(".nameInput").forEach(input=>{
+  input.addEventListener("input", drawWheel);
+});
+
+drawWheel();
+</script>
+
+</body>
+</html>

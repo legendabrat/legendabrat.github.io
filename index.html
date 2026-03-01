@@ -4,254 +4,221 @@
 <meta charset="UTF-8">
 <title>Крутим барабан</title>
 
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Expires" content="0" />
-
 <style>
 body{
-  margin:0;
-  background:#111;
-  color:white;
-  font-family:'Segoe UI', Tahoma, sans-serif;
-  display:flex;
-}
-
-/* ЛЕВАЯ ПАНЕЛЬ */
-.sidebar{
-  width:260px;
-  background:rgba(255,255,255,0.05);
-  padding:20px;
-}
-
-.sidebar h2{
-  margin-top:0;
-}
-
-.nameInput{
-  width:100%;
-  padding:8px;
-  margin-bottom:8px;
-  background:rgba(255,255,255,0.1);
-  border:none;
-  color:white;
-  font-size:14px;
-  outline:none;
-}
-
-/* ОСНОВНАЯ ЧАСТЬ */
-.main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+    margin:0;
+    background:#0f172a;
+    color:white;
+    font-family:'Segoe UI',sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
 
 h1{
-  margin-bottom:20px;
-  font-weight:500;
+    margin:20px;
+    font-size:32px;
 }
 
 .container{
-  position:relative;
+    display:flex;
+    gap:40px;
+    align-items:center;
 }
 
-.arrow{
-  position:absolute;
-  left:-40px;
-  top:50%;
-  transform:translateY(-50%) rotate(180deg);
-  width:0;
-  height:0;
-  border-top:15px solid transparent;
-  border-bottom:15px solid transparent;
-  border-right:30px solid white;
+.inputs{
+    background:rgba(255,255,255,0.08);
+    padding:20px;
+    border-radius:14px;
+}
+
+.inputs input{
+    display:block;
+    width:200px;
+    margin:8px 0;
+    padding:8px;
+    border:none;
+    border-radius:8px;
+    font-size:14px;
+}
+
+.wheel-wrapper{
+    position:relative;
 }
 
 canvas{
-  border-radius:50%;
-  border:8px solid #333;
+    border-radius:50%;
+    box-shadow:0 0 40px rgba(0,0,0,0.6);
 }
 
-/* ПЛАШКА ПОБЕДИТЕЛЯ */
-#winnerBox{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%) scale(0.8);
-  background:#1c1c1c;
-  padding:70px 120px;
-  border-radius:30px;
-  text-align:center;
-  box-shadow:0 30px 80px rgba(0,0,0,0.8);
-  opacity:0;
-  pointer-events:none;
-  transition:0.4s ease;
+.arrow{
+    position:absolute;
+    top:-15px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:40px;
 }
 
-#winnerBox.active{
-  opacity:1;
-  pointer-events:auto;
-  transform:translate(-50%,-50%) scale(1);
+button{
+    margin-top:20px;
+    padding:10px 25px;
+    font-size:18px;
+    border:none;
+    border-radius:12px;
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
 }
 
-#winnerTitle{
-  font-size:28px;
-  letter-spacing:2px;
-  opacity:0.8;
+button:hover{
+    background:#1d4ed8;
 }
 
-#winnerName{
-  font-size:56px;
-  margin-top:20px;
-  font-weight:700;
-  font-family:'Trebuchet MS','Segoe UI',sans-serif;
-  background:linear-gradient(90deg,#f1c40f,#e67e22);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+/* Победитель */
+.overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    visibility:hidden;
+}
+
+.winner-box{
+    background:white;
+    color:black;
+    padding:40px 60px;
+    border-radius:20px;
+    font-size:40px;
+    font-weight:bold;
+    text-align:center;
+    animation:pop 0.4s ease;
+}
+
+@keyframes pop{
+    from{transform:scale(0.5);opacity:0;}
+    to{transform:scale(1);opacity:1;}
 }
 </style>
 </head>
+
 <body>
 
-<div class="sidebar">
-  <h2>Имена</h2>
-  <input class="nameInput" id="n0" placeholder="Игрок 1">
-  <input class="nameInput" id="n1" placeholder="Игрок 2">
-  <input class="nameInput" id="n2" placeholder="Игрок 3">
-  <input class="nameInput" id="n3" placeholder="Игрок 4">
-  <input class="nameInput" id="n4" placeholder="Игрок 5">
-  <input class="nameInput" id="n5" placeholder="Игрок 6">
-  <input class="nameInput" id="n6" placeholder="Игрок 7">
-  <input class="nameInput" id="n7" placeholder="Игрок 8">
+<h1>🎯 Крутим барабан</h1>
+
+<div class="container">
+
+<div class="inputs">
+<input placeholder="Имя 1">
+<input placeholder="Имя 2">
+<input placeholder="Имя 3">
+<input placeholder="Имя 4">
+<input placeholder="Имя 5">
+<input placeholder="Имя 6">
 </div>
 
-<div class="main">
-  <h1>🎯 Крутим барабан</h1>
-
-  <div class="container">
-    <div class="arrow"></div>
-    <canvas id="wheel" width="420" height="420"></canvas>
-  </div>
-
-  <button style="margin-top:20px;padding:10px 25px;font-size:18px;border-radius:8px;border:none;cursor:pointer;" onclick="spin()">
-    Крутить
-  </button>
+<div class="wheel-wrapper">
+<div class="arrow">▼</div>
+<canvas id="wheel" width="450" height="450"></canvas>
 </div>
 
-<!-- ПЛАШКА -->
-<div id="winnerBox">
-  <div id="winnerTitle">ПОБЕДИТЕЛЬ</div>
-  <div id="winnerName"></div>
-  <br><br>
-  <button onclick="closeWinner()" style="padding:10px 30px;font-size:16px;border:none;border-radius:8px;cursor:pointer;">
-    Закрыть
-  </button>
 </div>
 
-<!-- Конфетти -->
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<button onclick="spin()">Крутить</button>
 
-<!-- Аплодисменты -->
-<audio id="applause" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1a75.mp3?filename=applause-2-6844.mp3"></audio>
+<div class="overlay" id="overlay">
+<div class="winner-box" id="winnerText"></div>
+</div>
+
+<audio id="clap" src="https://assets.mixkit.co/sfx/preview/mixkit-happy-crowd-applause-462.mp3"></audio>
 
 <script>
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
-const winnerBox = document.getElementById("winnerBox");
-const winnerNameEl = document.getElementById("winnerName");
-const applause = document.getElementById("applause");
+const inputs = document.querySelectorAll(".inputs input");
+const overlay = document.getElementById("overlay");
+const winnerText = document.getElementById("winnerText");
+const clap = document.getElementById("clap");
 
-let angle = 0;
-let spinning = false;
+let rotation = 0;
 
-const colors = ["#e74c3c","#f1c40f","#3498db","#2ecc71"];
+const colors = [
+    "#ef4444", // мягкий красный
+    "#3b82f6", // мягкий синий
+    "#facc15", // желтый
+    "#22c55e"  // зеленый
+];
 
 function getNames(){
-  let arr=[];
-  for(let i=0;i<8;i++){
-    let val=document.getElementById("n"+i).value.trim();
-    arr.push(val==="" ? "Игрок "+(i+1) : val);
-  }
-  return arr;
+    let arr=[];
+    inputs.forEach(i=>{
+        if(i.value.trim()!=="") arr.push(i.value.trim());
+    });
+    return arr.length ? arr : ["1","2","3","4","5","6"];
 }
 
 function drawWheel(){
-  const names = getNames();
-  ctx.clearRect(0,0,420,420);
-  const arc = 2*Math.PI / names.length;
+    const names = getNames();
+    const arc = 2*Math.PI/names.length;
+    ctx.clearRect(0,0,450,450);
 
-  for(let i=0;i<names.length;i++){
-    ctx.beginPath();
-    ctx.moveTo(210,210);
-    ctx.fillStyle = colors[i % colors.length];
-    ctx.arc(210,210,210,arc*i+angle,arc*(i+1)+angle);
-    ctx.fill();
+    for(let i=0;i<names.length;i++){
+        ctx.beginPath();
+        ctx.moveTo(225,225);
+        ctx.arc(225,225,225,rotation+i*arc,rotation+(i+1)*arc);
+        ctx.fillStyle=colors[i%4];
+        ctx.fill();
 
-    ctx.save();
-    ctx.translate(210,210);
-    ctx.rotate(arc*i + arc/2 + angle);
-    ctx.fillStyle="white";
-    ctx.font="18px 'Segoe UI'";
-    ctx.textAlign="right";
-    ctx.fillText(names[i],170,6);
-    ctx.restore();
-  }
+        ctx.save();
+        ctx.translate(225,225);
+        ctx.rotate(rotation+i*arc+arc/2);
+        ctx.fillStyle="white";
+        ctx.font="bold 20px Segoe UI";
+        ctx.textAlign="right";
+        ctx.fillText(names[i],200,10);
+        ctx.restore();
+    }
 }
 
 function spin(){
-  if(spinning) return;
-  spinning=true;
+    const names=getNames();
+    const arc=2*Math.PI/names.length;
 
-  let velocity = 0.35 + Math.random()*0.25;
+    const extra= Math.random()*Math.PI*6 + Math.PI*6;
+    rotation+=extra;
 
-  function animate(){
-    angle += velocity;
-    velocity *= 0.985;
-    drawWheel();
+    const duration=4000;
+    const start=performance.now();
 
-    if(velocity > 0.002){
-      requestAnimationFrame(animate);
-    } else {
-      spinning=false;
-      showWinner();
+    function animate(now){
+        let progress=(now-start)/duration;
+        if(progress<1){
+            drawWheel();
+            requestAnimationFrame(animate);
+        }else{
+            finish(names,arc);
+        }
     }
-  }
 
-  animate();
+    requestAnimationFrame(animate);
 }
 
-function showWinner(){
-  const names = getNames();
-  const arc = 2*Math.PI / names.length;
+function finish(names,arc){
+    let normalized=(rotation%(2*Math.PI));
+    let index=Math.floor((2*Math.PI-normalized)/arc)%names.length;
 
-  let pointerAngle = Math.PI; 
-  let normalized = (angle + pointerAngle) % (Math.PI*2);
-  let index = Math.floor((Math.PI*2 - normalized) / arc) % names.length;
-
-  let winner = names[index];
-
-  winnerNameEl.textContent = winner;
-  winnerBox.classList.add("active");
-
-  applause.currentTime = 0;
-  applause.play();
-
-  confetti({
-    particleCount:180,
-    spread:100,
-    origin:{ y:0.6 }
-  });
+    winnerText.textContent="🎉 "+names[index];
+    overlay.style.visibility="visible";
+    clap.play();
 }
 
-function closeWinner(){
-  winnerBox.classList.remove("active");
-}
-
-document.querySelectorAll(".nameInput").forEach(input=>{
-  input.addEventListener("input", drawWheel);
-});
+overlay.onclick=()=>{
+    overlay.style.visibility="hidden";
+};
 
 drawWheel();
 </script>

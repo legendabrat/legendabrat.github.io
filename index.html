@@ -9,33 +9,33 @@ body{
   margin:0;
   background:#111;
   color:white;
-  font-family:Arial;
+  font-family:'Segoe UI', Tahoma, sans-serif;
   display:flex;
 }
 
+/* Левая панель */
 .sidebar{
   width:260px;
-  background:rgba(255,255,255,0.07);
+  background:rgba(255,255,255,0.06);
   padding:20px;
 }
 
-.sidebar input{
-  width:100%;
-  padding:8px;
-  margin-bottom:10px;
+.sidebar h2{
+  margin-top:0;
 }
 
-.sidebar button{
+.nameInput{
   width:100%;
   padding:8px;
-  cursor:pointer;
-}
-
-.nameList{
-  margin-top:15px;
+  margin-bottom:8px;
+  background:rgba(255,255,255,0.1);
+  border:none;
+  color:white;
   font-size:14px;
+  outline:none;
 }
 
+/* Центр */
 .main{
   flex:1;
   display:flex;
@@ -46,6 +46,7 @@ body{
 
 h1{
   margin-bottom:20px;
+  font-weight:500;
 }
 
 .container{
@@ -69,9 +70,16 @@ h1{
 
 <div class="sidebar">
   <h2>Имена</h2>
-  <input type="text" id="nameInput" placeholder="Введите имя">
-  <button onclick="addName()">Добавить</button>
-  <div class="nameList" id="nameList"></div>
+
+  <input class="nameInput" id="n0" placeholder="Игрок 1">
+  <input class="nameInput" id="n1" placeholder="Игрок 2">
+  <input class="nameInput" id="n2" placeholder="Игрок 3">
+  <input class="nameInput" id="n3" placeholder="Игрок 4">
+  <input class="nameInput" id="n4" placeholder="Игрок 5">
+  <input class="nameInput" id="n5" placeholder="Игрок 6">
+  <input class="nameInput" id="n6" placeholder="Игрок 7">
+  <input class="nameInput" id="n7" placeholder="Игрок 8">
+
 </div>
 
 <div class="main">
@@ -79,7 +87,7 @@ h1{
 
   <div class="container">
     <div class="arrow"></div>
-    <canvas id="wheel" width="400" height="400"></canvas>
+    <canvas id="wheel" width="420" height="420"></canvas>
   </div>
 
   <button style="margin-top:20px;padding:10px 20px;font-size:18px;" onclick="spin()">
@@ -91,37 +99,45 @@ h1{
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
-let names = ["Игрок 1","Игрок 2","Игрок 3","Игрок 4","Игрок 5","Игрок 6","Игрок 7","Игрок 8"];
-const colors = ["#ff0000","#ffff00","#0000ff","#00ff00"];
-
 let angle = 0;
 let spinning = false;
 
-function updateList(){
-  const list = document.getElementById("nameList");
-  list.innerHTML="";
-  names.forEach(n=>{
-    list.innerHTML += n + "<br>";
-  });
+const colors = [
+  "#e74c3c",   // мягкий красный
+  "#f1c40f",   // желтый
+  "#3498db",   // мягкий синий
+  "#2ecc71"    // зеленый
+];
+
+function getNames(){
+  let arr=[];
+  for(let i=0;i<8;i++){
+    let val=document.getElementById("n"+i).value.trim();
+    arr.push(val==="" ? "Игрок "+(i+1) : val);
+  }
+  return arr;
 }
 
 function drawWheel(){
-  ctx.clearRect(0,0,400,400);
+  const names = getNames();
+
+  ctx.clearRect(0,0,420,420);
   const arc = 2*Math.PI / names.length;
 
   for(let i=0;i<names.length;i++){
     ctx.beginPath();
-    ctx.moveTo(200,200);
+    ctx.moveTo(210,210);
     ctx.fillStyle = colors[i % colors.length];
-    ctx.arc(200,200,200,arc*i+angle,arc*(i+1)+angle);
+    ctx.arc(210,210,210,arc*i+angle,arc*(i+1)+angle);
     ctx.fill();
 
     ctx.save();
-    ctx.translate(200,200);
+    ctx.translate(210,210);
     ctx.rotate(arc*i + arc/2 + angle);
-    ctx.fillStyle="black";
-    ctx.font="16px Arial";
-    ctx.fillText(names[i],120,5);
+    ctx.fillStyle="white";
+    ctx.font="18px 'Segoe UI'";
+    ctx.textAlign="right";
+    ctx.fillText(names[i],170,6);
     ctx.restore();
   }
 }
@@ -130,11 +146,11 @@ function spin(){
   if(spinning) return;
   spinning = true;
 
-  let velocity = 0.3 + Math.random()*0.3;
+  let velocity = 0.35 + Math.random()*0.25;
 
   function animate(){
     angle += velocity;
-    velocity *= 0.98;
+    velocity *= 0.985;
 
     drawWheel();
 
@@ -150,21 +166,17 @@ function spin(){
 }
 
 function showWinner(){
+  const names = getNames();
   const arc = 2*Math.PI / names.length;
   let index = Math.floor((Math.PI*2 - angle % (Math.PI*2)) / arc) % names.length;
   alert("Победитель: " + names[index]);
 }
 
-function addName(){
-  const input = document.getElementById("nameInput");
-  if(input.value.trim()==="") return;
-  names.push(input.value.trim());
-  input.value="";
-  updateList();
-  drawWheel();
-}
+/* Авто перерисовка при вводе */
+document.querySelectorAll(".nameInput").forEach(input=>{
+  input.addEventListener("input", drawWheel);
+});
 
-updateList();
 drawWheel();
 </script>
 

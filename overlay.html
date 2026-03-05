@@ -388,7 +388,7 @@ body::before {
 
   <!-- TIP -->
   <div class="tip">
-    💡 Меняй цифры → нажимай <strong style="color:#c0392b">ОБНОВИТЬ ОВЕРЛЕЙ</strong> → скопируй ссылку → вставь в OBS Browser Source. Больше никакого кода!
+    💡 <strong style="color:#c0392b">Как пользоваться:</strong> Скопируй ссылку → вставь в OBS один раз → забудь про OBS. Дальше только меняй цифры здесь и жми <strong style="color:#c0392b">⚡ ОБНОВИТЬ</strong> — оверлей обновится сам мгновенно без перезагрузки.
   </div>
 
   <!-- PREVIEW -->
@@ -495,9 +495,9 @@ body::before {
 
   <!-- LINK BOX -->
   <div class="link-box">
-    <div class="link-label">🔗 Ссылка для OBS Browser Source</div>
+    <div class="link-label">🔗 Ссылка для OBS — вставь один раз и больше не меняй</div>
     <div class="link-row">
-      <div class="link-text" id="linkText">legendabrat.github.io/overlay.html?mmr=3840&goal=4000...</div>
+      <div class="link-text" id="linkText">Нажми ⚡ ОБНОВИТЬ чтобы сгенерировать ссылку</div>
       <button class="btn-copy" id="copyBtn" onclick="copyLink()">КОПИРОВАТЬ</button>
       <button class="btn-open" onclick="openOverlay()">ОТКРЫТЬ</button>
     </div>
@@ -634,29 +634,39 @@ function updatePreview() {
   buildLink();
 }
 
-// ── Build link ──
-function buildLink() {
-  const mmr   = document.getElementById('fMmr').value;
-  const goal  = document.getElementById('fGoal').value;
-  const start = document.getElementById('fStart').value;
-  const delta = document.getElementById('fDelta').value;
-  const wins  = document.getElementById('fWins').value;
-  const losses= document.getElementById('fLosses').value;
+// ── Build hash ──
+// Формат: #mmr|goal|start|delta|wins|losses|streak|history
+function buildHash() {
+  const mmr    = document.getElementById('fMmr').value;
+  const goal   = document.getElementById('fGoal').value;
+  const start  = document.getElementById('fStart').value;
+  const delta  = document.getElementById('fDelta').value;
+  const wins   = document.getElementById('fWins').value;
+  const losses = document.getElementById('fLosses').value;
   const streakN = document.getElementById('fStreak').value;
-  const hist  = historyArr.join('');
+  const hist   = historyArr.join('');
+  const streakVal = streakType === 'win' ? streakN : streakType === 'loss' ? -streakN : 0;
 
-  const streakVal = streakType === 'win'  ?  streakN
-                  : streakType === 'loss' ? -streakN : 0;
+  return `${mmr}|${goal}|${start}|${delta}|${wins}|${losses}|${streakVal}|${hist}`;
+}
 
-  const url = `legendabrat.github.io/overlay.html?mmr=${mmr}&goal=${goal}&start=${start}&delta=${delta}&wins=${wins}&losses=${losses}&streak=${streakVal}&history=${hist}`;
-
-  document.getElementById('linkText').textContent = url;
-  return 'https://' + url;
+function getOverlayUrl(hash) {
+  return `https://legendabrat.github.io/overlay.html#${hash}`;
 }
 
 function applyAll() {
-  const url = buildLink();
-  // Flash button
+  const hash = buildHash();
+  const fullUrl = getOverlayUrl(hash);
+
+  // Показываем ссылку
+  document.getElementById('linkText').textContent = fullUrl;
+
+  // Если оверлей уже открыт в другой вкладке — меняем его hash напрямую
+  if (overlayWindow && !overlayWindow.closed) {
+    overlayWindow.location.hash = hash;
+  }
+
+  // Flash кнопки
   const btn = document.querySelector('.btn-update');
   btn.textContent = '✓ ОБНОВЛЕНО!';
   btn.style.background = 'linear-gradient(135deg, #1a5c2a, #00a040)';
@@ -667,20 +677,26 @@ function applyAll() {
 }
 
 function copyLink() {
-  const url = 'https://' + document.getElementById('linkText').textContent;
+  const hash = buildHash();
+  const url  = getOverlayUrl(hash);
+  document.getElementById('linkText').textContent = url;
   navigator.clipboard.writeText(url).then(() => {
     const btn = document.getElementById('copyBtn');
     btn.textContent = '✓ СКОПИРОВАНО';
     btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = 'КОПИРОВАТЬ';
-      btn.classList.remove('copied');
-    }, 2000);
+    setTimeout(() => { btn.textContent = 'КОПИРОВАТЬ'; btn.classList.remove('copied'); }, 2000);
   });
 }
 
+let overlayWindow = null;
 function openOverlay() {
-  window.open('https://' + document.getElementById('linkText').textContent, '_blank');
+  const hash = buildHash();
+  const url  = getOverlayUrl(hash);
+  if (overlayWindow && !overlayWindow.closed) {
+    overlayWindow.location.hash = hash;
+  } else {
+    overlayWindow = window.open(url, 'overlay');
+  }
 }
 
 function resetAll() {

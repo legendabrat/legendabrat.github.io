@@ -12,7 +12,6 @@ font-family:Arial, sans-serif;
 }
 
 .overlay{
-
 position:absolute;
 bottom:40px;
 left:40px;
@@ -72,12 +71,9 @@ overflow:hidden;
 }
 
 .progress{
-
 height:100%;
 width:50%;
-
 background:linear-gradient(90deg,#ffb300,#ff6f00);
-
 }
 
 </style>
@@ -89,36 +85,36 @@ background:linear-gradient(90deg,#ffb300,#ff6f00);
 
 <div class="block">
 <div class="big">
-<span id="mmr">3840</span>
+<span id="mmr">0</span>
 <span style="opacity:0.5">→</span>
-<span id="target">4000</span>
+<span id="target">0</span>
 </div>
 </div>
 
 <div class="block">
 <div class="big green">
-<span id="gain">+30</span>
+<span id="gain">0</span>
 </div>
 </div>
 
 <div class="block">
 <div class="big orange">
-<span id="wr">84%</span>
+<span id="wr">0%</span>
 </div>
 </div>
 
 <div class="block">
 <div class="big">
-<span class="green" id="wins">4</span>
+<span class="green" id="wins">0</span>
  /
-<span class="red" id="losses">2</span>
+<span class="red" id="losses">0</span>
 </div>
 <div class="label">СЕГОДНЯ</div>
 </div>
 
 <div class="block">
 <div class="big orange">
-<span id="streak">3</span>🔥
+<span id="streak">0</span>🔥
 </div>
 <div class="label">СТРИК</div>
 </div>
@@ -131,47 +127,27 @@ background:linear-gradient(90deg,#ffb300,#ff6f00);
 
 <script>
 
-async function loadData(){
+const params = new URLSearchParams(window.location.search);
 
-try{
-
-const response = await fetch("https://legendabrat.github.io/data.json?" + Date.now());
-
-const data = await response.json();
-
-if(data.mmr !== undefined)
-document.getElementById("mmr").innerText = data.mmr;
-
-if(data.target !== undefined)
-document.getElementById("target").innerText = data.target;
-
-if(data.gain !== undefined)
-document.getElementById("gain").innerText = data.gain;
-
-if(data.wr !== undefined)
-document.getElementById("wr").innerText = data.wr;
-
-if(data.wins !== undefined)
-document.getElementById("wins").innerText = data.wins;
-
-if(data.losses !== undefined)
-document.getElementById("losses").innerText = data.losses;
-
-if(data.streak !== undefined)
-document.getElementById("streak").innerText = data.streak;
-
-if(data.progress !== undefined)
-document.getElementById("progress").style.width = data.progress + "%";
-
-}catch(err){
-console.log("JSON load error");
+function set(id,val){
+if(val !== null){
+document.getElementById(id).innerText = val;
+}
 }
 
+set("mmr",params.get("mmr"));
+set("target",params.get("target"));
+set("gain",params.get("gain"));
+set("wr",params.get("wr"));
+set("wins",params.get("wins"));
+set("losses",params.get("losses"));
+set("streak",params.get("streak"));
+
+const progress = params.get("progress");
+
+if(progress){
+document.getElementById("progress").style.width = progress+"%";
 }
-
-loadData();
-
-setInterval(loadData,3000);
 
 </script>
 

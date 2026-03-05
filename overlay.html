@@ -195,15 +195,16 @@ body::before {
   overflow: hidden;
   margin-bottom: 16px;
   animation: fadeUp 0.6s 0.2s ease both;
+  display: inline-block;
 }
 
 
 
 .preview-bar {
-  padding: 14px 20px;
+  padding: 10px 16px;
   background: linear-gradient(90deg, rgba(4,2,2,0.97), rgba(12,4,4,0.95));
   border-top: 2px solid rgba(192,57,43,0.6);
-  display: flex; align-items: center; gap: 20px;
+  display: flex; align-items: center; gap: 0;
   position: relative; overflow: hidden;
 }
 
@@ -213,30 +214,32 @@ body::before {
   background: linear-gradient(90deg, transparent, rgba(192,57,43,0.8), transparent);
 }
 
-.pv-nick {
-  font-family: 'Oswald', sans-serif;
-  font-size: 20px; font-weight: 700; letter-spacing: 2px;
-  color: #c0392b; white-space: nowrap;
-  text-shadow: 0 0 16px rgba(192,57,43,0.4);
+/* MMR block */
+.pv-mmr-wrap {
+  min-width: 260px;
+  padding-right: 16px;
+  border-right: 1px solid rgba(192,57,43,0.2);
 }
-
-.pv-mmr-wrap { flex: 1; }
 
 .pv-mmr-top {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 7px;
+  margin-bottom: 6px;
 }
 
 .pv-mmr-nums {
-  font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; color: #ffffff;
+  font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: #ffffff;
   display: flex; align-items: center; gap: 6px;
 }
-.pv-mmr-nums .arrow { color: rgba(255,255,255,0.3); font-size: 18px; }
-.pv-mmr-nums .goal-val { color: rgba(255,255,255,0.45); font-size: 20px; }
-.pv-mmr-pct { font-size: 22px; font-weight: 700; color: #f5c842; letter-spacing: 1px; font-family: 'Oswald', sans-serif; }
+.pv-mmr-nums .arrow { color: rgba(255,255,255,0.25); font-size: 16px; }
+.pv-mmr-nums .goal-val { color: rgba(255,255,255,0.4); font-size: 22px; }
+.pv-mmr-pct {
+  font-family: 'Oswald', sans-serif;
+  font-size: 22px; font-weight: 700;
+  color: #f5c842; letter-spacing: 1px;
+}
 
 .pv-bar-bg {
-  height: 8px; background: rgba(255,255,255,0.06);
+  height: 7px; background: rgba(255,255,255,0.06);
   border-radius: 4px; overflow: hidden;
 }
 .pv-bar-fill {
@@ -246,29 +249,32 @@ body::before {
   transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
 }
 
+/* W/L block */
 .pv-wl {
   text-align: center; white-space: nowrap;
+  padding: 0 16px;
+  border-right: 1px solid rgba(192,57,43,0.2);
 }
 .pv-wl-vals {
-  font-family: 'Oswald', sans-serif; font-size: 22px; line-height: 1;
+  font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; line-height: 1;
 }
 .pv-wl-vals .w { color: #00e676; }
 .pv-wl-vals .sep { color: rgba(255,255,255,0.2); margin: 0 4px; }
 .pv-wl-vals .l { color: #ef5350; }
-.pv-wl-label { font-size: 9px; letter-spacing: 2px; color: rgba(192,57,43,0.4); margin-top: 2px; }
+.pv-wl-label { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.25); margin-top: 3px; text-transform: uppercase; }
 
-.pv-streak { text-align: center; white-space: nowrap; }
-.pv-streak-val {
-  font-family: 'Oswald', sans-serif; font-size: 22px; line-height: 1;
+/* Streak block */
+.pv-streak {
+  text-align: center; white-space: nowrap;
+  padding: 0 0 0 16px;
 }
-.pv-streak-val.win { color: #ffd740; text-shadow: 0 0 12px rgba(255,215,64,0.5); }
+.pv-streak-val {
+  font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; line-height: 1;
+}
+.pv-streak-val.win  { color: #ffd740; text-shadow: 0 0 12px rgba(255,215,64,0.4); }
 .pv-streak-val.loss { color: #ef5350; }
-.pv-streak-val.none { color: rgba(255,255,255,0.2); font-size: 16px; }
-.pv-streak-label { font-size: 9px; letter-spacing: 2px; color: rgba(192,57,43,0.4); margin-top: 2px; }
-
-.pv-hero { text-align: center; white-space: nowrap; }
-.pv-hero-icon { font-size: 26px; line-height: 1; }
-.pv-hero-name { font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-top: 2px; text-transform: uppercase; }
+.pv-streak-val.none { color: rgba(255,255,255,0.2); }
+.pv-streak-label { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.25); margin-top: 3px; text-transform: uppercase; }
 
 /* COPY LINK */
 .link-box {
@@ -392,14 +398,13 @@ body::before {
   <!-- PREVIEW -->
   <div class="preview-wrap">
     <div class="preview-bar">
-      <div class="pv-nick">LEGENDABRAT</div>
       <div class="pv-mmr-wrap">
         <div class="pv-mmr-top">
           <div class="pv-mmr-nums">
             <span id="pvCur">3840</span>
             <span class="arrow">→</span>
             <span class="goal-val" id="pvGoal">4000</span>
-            <span id="pvDelta" style="color:#00e676; margin-left:10px; font-size:18px; font-weight:700">+30</span>
+            <span id="pvDelta" style="color:#00e676; margin-left:10px; font-size:22px; font-weight:700">+30</span>
           </div>
           <div class="pv-mmr-pct" id="pvPct">92%</div>
         </div>
@@ -418,10 +423,6 @@ body::before {
       <div class="pv-streak">
         <div class="pv-streak-val win" id="pvStreak">3🔥</div>
         <div class="pv-streak-label">СТРИК</div>
-      </div>
-      <div class="pv-hero">
-        <div class="pv-hero-icon" id="pvHeroIcon">⚔️</div>
-        <div class="pv-hero-name" id="pvHeroName">Invoker</div>
       </div>
     </div>
   </div>

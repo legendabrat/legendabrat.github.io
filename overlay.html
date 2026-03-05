@@ -2,617 +2,749 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1920">
-<title>LEGENDABRAT Overlay</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEGENDABRAT — Панель управления</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* OBS: прозрачный фон */
-html, body {
-  width: 1920px;
-  height: 1080px;
-  background: transparent;
-  overflow: hidden;
+body {
+  background: #080a0e;
+  color: #c8d8e8;
   font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+  padding: 30px 20px;
 }
 
-/* ══════════════════════════════════════
-   BOTTOM BAR — главная полоска внизу
-   ══════════════════════════════════════ */
-.bottom-bar {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 110px;
-  background: linear-gradient(90deg,
-    rgba(4,2,2,0.97) 0%,
-    rgba(12,4,4,0.95) 40%,
-    rgba(12,4,4,0.95) 60%,
-    rgba(4,2,2,0.97) 100%
-  );
-  border-top: 2px solid rgba(192,57,43,0.7);
-  display: flex;
-  align-items: center;
-  padding: 0 32px;
-  gap: 0;
-  animation: slideUp 0.8s cubic-bezier(0.22,1,0.36,1) both;
-}
-
-/* Top glow line */
-.bottom-bar::before {
+body::before {
   content: '';
-  position: absolute;
-  top: -1px; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(192,57,43,0.9), rgba(255,100,80,0.6), rgba(192,57,43,0.9), transparent);
-  animation: linePulse 3s ease-in-out infinite;
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(192,57,43,0.08) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,45,61,0.15) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,45,61,0.15) 40px);
+  pointer-events: none; z-index: 0;
 }
 
-/* ── NICK BLOCK ── */
-.nick-block {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 280px;
-  padding-right: 28px;
-  border-right: 1px solid rgba(192,57,43,0.3);
+.wrap { max-width: 780px; margin: 0 auto; position: relative; z-index: 1; }
+
+/* HEADER */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+  animation: fadeUp 0.6s ease both;
 }
 
-.nick-tag {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: rgba(192,57,43,0.6);
-  margin-bottom: 2px;
+.header-tag {
+  font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(192,57,43,0.6); margin-bottom: 8px;
 }
 
-.nick-name {
+.header-title {
   font-family: 'Oswald', sans-serif;
-  font-size: 34px;
-  font-weight: 700;
-  letter-spacing: 3px;
+  font-size: 38px; font-weight: 700; letter-spacing: 4px;
   color: #c0392b;
-  text-shadow: 0 0 20px rgba(192,57,43,0.5);
-  line-height: 1;
+  text-shadow: 0 0 30px rgba(192,57,43,0.4);
 }
 
-/* ── MMR BLOCK ── */
-.mmr-block {
-  flex: 1;
-  padding: 0 28px;
-  border-right: 1px solid rgba(192,57,43,0.3);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 7px;
+.header-sub {
+  font-size: 13px; color: rgba(200,216,232,0.4);
+  letter-spacing: 2px; margin-top: 6px;
 }
 
-.mmr-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+/* CARD */
+.card {
+  background: #111820;
+  border: 1px solid #1e2d3d;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 16px;
+  animation: fadeUp 0.6s ease both;
 }
 
-.mmr-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: rgba(192,57,43,0.55);
-}
-
-.mmr-values {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.mmr-current {
+.card-title {
   font-family: 'Oswald', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: #e8e0d0;
-  letter-spacing: 1px;
+  font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(192,57,43,0.8);
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
 }
 
-.mmr-arrow {
-  font-size: 16px;
-  color: rgba(192,57,43,0.5);
+.card-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(192,57,43,0.3), transparent);
 }
 
-.mmr-goal {
-  font-family: 'Oswald', sans-serif;
-  font-size: 20px;
-  font-weight: 500;
-  color: rgba(192,57,43,0.7);
-  letter-spacing: 1px;
+/* GRID */
+.fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
 }
 
-.mmr-delta {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  padding: 2px 8px;
-  border-radius: 3px;
-  margin-left: 4px;
-}
-.mmr-delta.pos { color: #00e676; background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.25); }
-.mmr-delta.neg { color: #ef5350; background: rgba(239,83,80,0.1); border: 1px solid rgba(239,83,80,0.25); }
-.mmr-delta.zero { color: rgba(255,255,255,0.3); }
+/* FIELD */
+.field { display: flex; flex-direction: column; gap: 6px; }
 
-/* Progress bar */
-.mmr-bar-wrap {
-  position: relative;
-  height: 8px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 4px;
-  overflow: hidden;
+.field label {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(200,216,232,0.4);
 }
 
-.mmr-bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  background: linear-gradient(90deg, #8b1a10, #c0392b, #e74c3c);
-  box-shadow: 0 0 12px rgba(192,57,43,0.6);
-  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
-  position: relative;
-}
-
-/* Shine on bar */
-.mmr-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 50%;
-  background: rgba(255,255,255,0.18);
-  border-radius: 4px;
-}
-
-/* Glow pulse at bar end */
-.mmr-bar-tip {
-  position: absolute;
-  top: 50%;
-  transform: translate(50%, -50%);
-  width: 12px; height: 12px;
-  background: #ff6b55;
-  border-radius: 50%;
-  box-shadow: 0 0 10px 4px rgba(255,107,85,0.5);
-  animation: tipPulse 1.8s ease-in-out infinite;
-}
-
-.mmr-bar-pct {
-  position: absolute;
-  right: 0; top: -18px;
-  font-size: 11px; font-weight: 700;
-  color: rgba(192,57,43,0.6);
-  letter-spacing: 1px;
-}
-
-/* ── W/L BLOCK ── */
-.wl-block {
-  padding: 0 28px;
-  border-right: 1px solid rgba(192,57,43,0.3);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-width: 200px;
-}
-
-.wl-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 4px;
-  text-transform: uppercase; color: rgba(192,57,43,0.55);
-}
-
-.wl-scores {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.wl-win {
-  font-family: 'Oswald', sans-serif;
-  font-size: 42px; font-weight: 700; line-height: 1;
-  color: #00e676;
-  text-shadow: 0 0 16px rgba(0,230,118,0.4);
-}
-
-.wl-sep {
-  font-family: 'Oswald', sans-serif;
-  font-size: 28px; color: rgba(255,255,255,0.2);
-}
-
-.wl-loss {
-  font-family: 'Oswald', sans-serif;
-  font-size: 42px; font-weight: 700; line-height: 1;
-  color: #ef5350;
-  text-shadow: 0 0 16px rgba(239,83,80,0.4);
-}
-
-.wl-dots {
-  display: flex;
-  gap: 4px;
-}
-
-.wl-dot {
-  width: 10px; height: 10px;
-  border-radius: 2px;
-}
-.wl-dot.w { background: #00e676; box-shadow: 0 0 6px rgba(0,230,118,0.5); }
-.wl-dot.l { background: #ef5350; box-shadow: 0 0 6px rgba(239,83,80,0.5); }
-.wl-dot.empty { background: rgba(255,255,255,0.08); }
-
-/* ── STREAK BLOCK ── */
-.streak-block {
-  padding: 0 28px;
-  border-right: 1px solid rgba(192,57,43,0.3);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  min-width: 160px;
-}
-
-.streak-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 4px;
-  text-transform: uppercase; color: rgba(192,57,43,0.55);
-}
-
-.streak-value {
-  font-family: 'Oswald', sans-serif;
-  font-size: 38px; font-weight: 700; line-height: 1;
-}
-.streak-value.win-streak {
-  color: #ffd740;
-  text-shadow: 0 0 20px rgba(255,215,64,0.5);
-  animation: streakGlow 2s ease-in-out infinite;
-}
-.streak-value.loss-streak { color: #ef5350; }
-.streak-value.none { color: rgba(255,255,255,0.25); font-size: 24px; }
-
-.streak-text {
-  font-size: 11px; font-weight: 700; letter-spacing: 2px;
-  text-transform: uppercase;
-}
-.streak-text.win-streak { color: rgba(255,215,64,0.6); }
-.streak-text.loss-streak { color: rgba(239,83,80,0.6); }
-.streak-text.none { color: rgba(255,255,255,0.2); }
-
-/* ── HERO BLOCK ── */
-.hero-block {
-  padding: 0 0 0 28px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  min-width: 150px;
-}
-
-.hero-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 4px;
-  text-transform: uppercase; color: rgba(192,57,43,0.55);
-}
-
-.hero-icon {
-  width: 54px; height: 54px;
+.field input, .field select {
+  background: #0d1520;
+  border: 1px solid #1e2d3d;
   border-radius: 6px;
-  border: 1px solid rgba(192,57,43,0.35);
-  background: rgba(192,57,43,0.08);
+  color: #e0eaf5;
+  font-family: 'Oswald', sans-serif;
+  font-size: 22px; font-weight: 600;
+  letter-spacing: 1px;
+  padding: 10px 14px;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.field input:focus, .field select:focus {
+  border-color: rgba(192,57,43,0.6);
+  box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+}
+
+.field select option { background: #0d1520; font-size: 16px; }
+
+/* STREAK BUTTONS */
+.streak-btns {
+  display: flex; gap: 8px;
+}
+
+.s-btn {
+  flex: 1; padding: 10px 8px;
+  background: #0d1520; border: 1px solid #1e2d3d;
+  border-radius: 6px; cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: rgba(200,216,232,0.5);
+  transition: all 0.2s; text-align: center;
+}
+.s-btn:hover { border-color: rgba(192,57,43,0.4); color: #e0eaf5; }
+.s-btn.active-win { background: rgba(0,230,118,0.1); border-color: rgba(0,230,118,0.5); color: #00e676; }
+.s-btn.active-loss { background: rgba(239,83,80,0.1); border-color: rgba(239,83,80,0.5); color: #ef5350; }
+.s-btn.active-none { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); }
+
+/* HISTORY DOTS */
+.history-builder {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.history-dots {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+
+.h-dot {
+  width: 36px; height: 36px;
+  border-radius: 6px; border: 1px solid #1e2d3d;
+  background: #0d1520; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 28px;
-  position: relative;
+  font-size: 14px; font-weight: 700;
+  transition: all 0.15s;
+  color: rgba(255,255,255,0.2);
+}
+.h-dot.win  { background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.5); color: #00e676; }
+.h-dot.loss { background: rgba(239,83,80,0.15);  border-color: rgba(239,83,80,0.5);  color: #ef5350; }
+
+.history-controls {
+  display: flex; gap: 8px;
+}
+
+.h-add-btn {
+  padding: 8px 14px;
+  border-radius: 5px; border: 1px solid #1e2d3d;
+  background: #0d1520; cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.h-add-btn.w { color: #00e676; }
+.h-add-btn.w:hover { border-color: rgba(0,230,118,0.5); background: rgba(0,230,118,0.08); }
+.h-add-btn.l { color: #ef5350; }
+.h-add-btn.l:hover { border-color: rgba(239,83,80,0.5); background: rgba(239,83,80,0.08); }
+.h-add-btn.reset { color: rgba(255,255,255,0.3); }
+.h-add-btn.reset:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); }
+
+/* HERO PICKER */
+.hero-picker {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+
+.hero-btn {
+  padding: 7px 12px;
+  background: #0d1520; border: 1px solid #1e2d3d;
+  border-radius: 5px; cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: rgba(200,216,232,0.5); transition: all 0.15s;
+  white-space: nowrap;
+}
+.hero-btn:hover { border-color: rgba(192,57,43,0.4); color: #e0eaf5; }
+.hero-btn.active { background: rgba(192,57,43,0.12); border-color: rgba(192,57,43,0.6); color: #e0eaf5; }
+
+/* PREVIEW BAR */
+.preview-wrap {
+  background: #0a0d12;
+  border: 1px solid #1e2d3d;
+  border-radius: 10px;
   overflow: hidden;
-}
-.hero-icon::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.06), transparent);
+  margin-bottom: 16px;
+  animation: fadeUp 0.6s 0.2s ease both;
 }
 
-.hero-name {
-  font-family: 'Oswald', sans-serif;
-  font-size: 13px; font-weight: 600; letter-spacing: 1px;
-  color: rgba(255,255,255,0.6);
-  text-transform: uppercase;
+.preview-label {
+  padding: 10px 16px;
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(192,57,43,0.5);
+  border-bottom: 1px solid #1e2d3d;
+  background: rgba(192,57,43,0.04);
 }
 
-/* ══════════════════════════════════════
-   TOP RIGHT — Alert area
-   ══════════════════════════════════════ */
-.alert-area {
-  position: absolute;
-  top: 30px; right: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
+.preview-bar {
+  padding: 14px 20px;
+  background: linear-gradient(90deg, rgba(4,2,2,0.97), rgba(12,4,4,0.95));
+  border-top: 2px solid rgba(192,57,43,0.6);
+  display: flex; align-items: center; gap: 20px;
+  position: relative; overflow: hidden;
 }
 
-.alert-box {
-  background: linear-gradient(135deg, rgba(8,3,3,0.95), rgba(15,5,5,0.95));
-  border: 1px solid rgba(192,57,43,0.5);
-  border-radius: 6px;
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: alertIn 0.5s cubic-bezier(0.22,1,0.36,1) both, alertOut 0.4s ease 4.5s forwards;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.6), 0 0 30px rgba(192,57,43,0.1);
-}
-
-.alert-box::before {
+.preview-bar::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(192,57,43,0.8), transparent);
 }
 
-.alert-icon { font-size: 22px; }
-
-.alert-text {
+.pv-nick {
   font-family: 'Oswald', sans-serif;
-  font-size: 18px; font-weight: 600;
-  letter-spacing: 2px; text-transform: uppercase;
+  font-size: 20px; font-weight: 700; letter-spacing: 2px;
+  color: #c0392b; white-space: nowrap;
+  text-shadow: 0 0 16px rgba(192,57,43,0.4);
 }
 
-.alert-text.follow { color: #c0392b; }
-.alert-text.winstreak { color: #ffd740; }
-.alert-text.mmr-up { color: #00e676; }
+.pv-mmr-wrap { flex: 1; }
 
-/* ══════════════════════════════════════
-   TOP LEFT — live indicator
-   ══════════════════════════════════════ */
-.live-badge {
-  position: absolute;
-  top: 28px; left: 28px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(4,2,2,0.85);
-  border: 1px solid rgba(192,57,43,0.4);
-  border-radius: 4px;
-  padding: 7px 14px;
-  animation: slideDown 0.8s 0.3s cubic-bezier(0.22,1,0.36,1) both;
+.pv-mmr-top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 5px; font-size: 12px;
 }
 
-.live-dot {
-  width: 9px; height: 9px;
-  background: #c0392b;
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(192,57,43,0.8);
-  animation: livePulse 1.5s ease-in-out infinite;
+.pv-mmr-nums {
+  font-family: 'Oswald', sans-serif; font-size: 16px; color: #e8e0d0;
+}
+.pv-mmr-nums span { color: rgba(192,57,43,0.6); font-size: 12px; }
+.pv-mmr-pct { font-size: 11px; color: rgba(192,57,43,0.5); letter-spacing: 1px; }
+
+.pv-bar-bg {
+  height: 6px; background: rgba(255,255,255,0.06);
+  border-radius: 3px; overflow: hidden;
+}
+.pv-bar-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, #8b1a10, #c0392b, #e74c3c);
+  box-shadow: 0 0 8px rgba(192,57,43,0.6);
+  transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
 }
 
-.live-text {
+.pv-wl {
+  text-align: center; white-space: nowrap;
+}
+.pv-wl-vals {
+  font-family: 'Oswald', sans-serif; font-size: 22px; line-height: 1;
+}
+.pv-wl-vals .w { color: #00e676; }
+.pv-wl-vals .sep { color: rgba(255,255,255,0.2); margin: 0 4px; }
+.pv-wl-vals .l { color: #ef5350; }
+.pv-wl-label { font-size: 9px; letter-spacing: 2px; color: rgba(192,57,43,0.4); margin-top: 2px; }
+
+.pv-streak { text-align: center; white-space: nowrap; }
+.pv-streak-val {
+  font-family: 'Oswald', sans-serif; font-size: 22px; line-height: 1;
+}
+.pv-streak-val.win { color: #ffd740; text-shadow: 0 0 12px rgba(255,215,64,0.5); }
+.pv-streak-val.loss { color: #ef5350; }
+.pv-streak-val.none { color: rgba(255,255,255,0.2); font-size: 16px; }
+.pv-streak-label { font-size: 9px; letter-spacing: 2px; color: rgba(192,57,43,0.4); margin-top: 2px; }
+
+.pv-hero { text-align: center; white-space: nowrap; }
+.pv-hero-icon { font-size: 26px; line-height: 1; }
+.pv-hero-name { font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-top: 2px; text-transform: uppercase; }
+
+/* COPY LINK */
+.link-box {
+  background: #0d1520;
+  border: 1px solid #1e2d3d;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+
+.link-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(192,57,43,0.5);
+  margin-bottom: 8px;
+}
+
+.link-row {
+  display: flex; gap: 8px; align-items: center;
+}
+
+.link-text {
+  flex: 1;
+  background: #080c14; border: 1px solid #1a2535;
+  border-radius: 5px; padding: 10px 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; color: rgba(200,216,232,0.7);
+  word-break: break-all; line-height: 1.4;
+}
+
+/* BUTTONS */
+.btn-copy, .btn-open {
+  padding: 11px 20px;
+  border-radius: 6px; border: none; cursor: pointer;
   font-family: 'Oswald', sans-serif;
-  font-size: 16px; font-weight: 600;
-  letter-spacing: 4px; color: #c0392b;
+  font-size: 14px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; transition: all 0.2s;
+  white-space: nowrap;
 }
 
-/* ══════════════════════════════════════
-   ANIMATIONS
-   ══════════════════════════════════════ */
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+.btn-copy {
+  background: rgba(192,57,43,0.15);
+  border: 1px solid rgba(192,57,43,0.5);
+  color: #c0392b;
+}
+.btn-copy:hover { background: rgba(192,57,43,0.25); box-shadow: 0 0 20px rgba(192,57,43,0.2); }
+.btn-copy.copied { background: rgba(0,230,118,0.1); border-color: rgba(0,230,118,0.5); color: #00e676; }
+
+.btn-open {
+  background: rgba(192,57,43,0.2);
+  border: 1px solid rgba(192,57,43,0.6);
+  color: #e0eaf5;
+}
+.btn-open:hover { background: rgba(192,57,43,0.35); }
+
+.actions-row {
+  display: flex; gap: 10px; margin-bottom: 16px;
+  animation: fadeUp 0.6s 0.35s ease both;
 }
 
-@keyframes slideDown {
-  from { transform: translateY(-20px); opacity: 0; }
-  to   { transform: translateY(0);     opacity: 1; }
+.btn-main {
+  flex: 1; padding: 16px;
+  border-radius: 8px; border: none; cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; transition: all 0.2s;
 }
 
-@keyframes linePulse {
-  0%, 100% { opacity: 0.7; }
-  50%       { opacity: 1; }
+.btn-update {
+  background: linear-gradient(135deg, #8b1a10, #c0392b);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(192,57,43,0.3);
+}
+.btn-update:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(192,57,43,0.45); }
+.btn-update:active { transform: translateY(0); }
+
+.btn-reset-all {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #1e2d3d;
+  color: rgba(200,216,232,0.4);
+  flex: 0 0 auto; padding: 16px 24px;
+  border-radius: 8px; cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.btn-reset-all:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); }
+
+/* TIP */
+.tip {
+  background: rgba(192,57,43,0.05);
+  border: 1px solid rgba(192,57,43,0.15);
+  border-left: 3px solid rgba(192,57,43,0.5);
+  border-radius: 6px; padding: 12px 16px;
+  font-size: 13px; color: rgba(200,216,232,0.5);
+  line-height: 1.6; margin-bottom: 16px;
+  animation: fadeUp 0.6s 0.4s ease both;
 }
 
-@keyframes tipPulse {
-  0%, 100% { box-shadow: 0 0 10px 4px rgba(255,107,85,0.4); }
-  50%       { box-shadow: 0 0 18px 8px rgba(255,107,85,0.7); }
-}
-
-@keyframes streakGlow {
-  0%, 100% { text-shadow: 0 0 20px rgba(255,215,64,0.4); }
-  50%       { text-shadow: 0 0 40px rgba(255,215,64,0.8), 0 0 80px rgba(255,215,64,0.3); }
-}
-
-@keyframes livePulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(192,57,43,0.8); }
-  50%       { opacity: 0.5; box-shadow: 0 0 4px rgba(192,57,43,0.3); }
-}
-
-@keyframes alertIn {
-  from { transform: translateX(40px); opacity: 0; }
-  to   { transform: translateX(0);    opacity: 1; }
-}
-
-@keyframes alertOut {
-  from { transform: translateX(0);    opacity: 1; }
-  to   { transform: translateX(60px); opacity: 0; }
-}
-
-@keyframes barFill {
-  from { width: 0%; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<!-- LIVE badge top-left -->
-<div class="live-badge">
-  <div class="live-dot"></div>
-  <div class="live-text">LIVE</div>
-</div>
-
-<!-- Alert demo top-right -->
-<div class="alert-area" id="alertArea"></div>
-
-<!-- BOTTOM BAR -->
-<div class="bottom-bar">
-
-  <!-- Nick -->
-  <div class="nick-block">
-    <div class="nick-tag">Dota 2 · RU</div>
-    <div class="nick-name" id="nickName">LEGENDABRAT</div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-tag">⚔️ Dota 2 · Twitch · OBS</div>
+    <div class="header-title">LEGENDABRAT</div>
+    <div class="header-sub">Панель управления оверлеем</div>
   </div>
 
-  <!-- MMR Progress -->
-  <div class="mmr-block">
-    <div class="mmr-header">
-      <span class="mmr-label">MMR ПРОГРЕСС</span>
-      <div class="mmr-values">
-        <span class="mmr-current" id="mmrCurrent">3840</span>
-        <span class="mmr-arrow">→</span>
-        <span class="mmr-goal" id="mmrGoal">4000</span>
-        <span class="mmr-delta pos" id="mmrDelta">+30</span>
+  <!-- TIP -->
+  <div class="tip">
+    💡 Меняй цифры → нажимай <strong style="color:#c0392b">ОБНОВИТЬ ОВЕРЛЕЙ</strong> → скопируй ссылку → вставь в OBS Browser Source. Больше никакого кода!
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-wrap">
+    <div class="preview-label">👁 Превью оверлея</div>
+    <div class="preview-bar">
+      <div class="pv-nick">LEGENDABRAT</div>
+      <div class="pv-mmr-wrap">
+        <div class="pv-mmr-top">
+          <div class="pv-mmr-nums">
+            <span id="pvCur">3840</span> → <span id="pvGoal" style="color:rgba(192,57,43,0.6)">4000</span>
+            <span id="pvDelta" style="color:#00e676; margin-left:8px; font-size:14px">+30</span>
+          </div>
+          <div class="pv-mmr-pct" id="pvPct">92%</div>
+        </div>
+        <div class="pv-bar-bg">
+          <div class="pv-bar-fill" id="pvBar" style="width:92%"></div>
+        </div>
+      </div>
+      <div class="pv-wl">
+        <div class="pv-wl-vals">
+          <span class="w" id="pvWins">4</span>
+          <span class="sep">/</span>
+          <span class="l" id="pvLosses">2</span>
+        </div>
+        <div class="pv-wl-label">СЕССИЯ</div>
+      </div>
+      <div class="pv-streak">
+        <div class="pv-streak-val win" id="pvStreak">3🔥</div>
+        <div class="pv-streak-label">СТРИК</div>
+      </div>
+      <div class="pv-hero">
+        <div class="pv-hero-icon" id="pvHeroIcon">⚔️</div>
+        <div class="pv-hero-name" id="pvHeroName">Invoker</div>
       </div>
     </div>
-    <div class="mmr-bar-wrap">
-      <div class="mmr-bar-pct" id="mmrPct">92%</div>
-      <div class="mmr-bar-fill" id="mmrBar" style="width: 0%">
-        <div class="mmr-bar-tip" id="barTip" style="right: -6px"></div>
+  </div>
+
+  <!-- MMR CARD -->
+  <div class="card" style="animation-delay:0.05s">
+    <div class="card-title">📊 MMR</div>
+    <div class="fields-grid">
+      <div class="field">
+        <label>Текущий MMR</label>
+        <input type="number" id="fMmr" value="3840" min="0" max="12000" oninput="updatePreview()">
+      </div>
+      <div class="field">
+        <label>Цель MMR</label>
+        <input type="number" id="fGoal" value="4000" min="0" max="12000" oninput="updatePreview()">
+      </div>
+      <div class="field">
+        <label>Старт (начало стрима)</label>
+        <input type="number" id="fStart" value="3000" min="0" max="12000" oninput="updatePreview()">
+      </div>
+      <div class="field">
+        <label>Изменение за сессию</label>
+        <input type="text" id="fDelta" value="+30" placeholder="+30 или -15" oninput="updatePreview()">
       </div>
     </div>
   </div>
 
-  <!-- W/L -->
-  <div class="wl-block">
-    <span class="wl-label">Сессия</span>
-    <div class="wl-scores">
-      <span class="wl-win" id="wins">4</span>
-      <span class="wl-sep">/</span>
-      <span class="wl-loss" id="losses">2</span>
+  <!-- W/L CARD -->
+  <div class="card" style="animation-delay:0.1s">
+    <div class="card-title">⚔️ Победы / Поражения</div>
+    <div class="fields-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px">
+      <div class="field">
+        <label>Победы</label>
+        <input type="number" id="fWins" value="4" min="0" max="99" oninput="updatePreview()">
+      </div>
+      <div class="field">
+        <label>Поражения</label>
+        <input type="number" id="fLosses" value="2" min="0" max="99" oninput="updatePreview()">
+      </div>
     </div>
-    <div class="wl-dots" id="wlDots"></div>
+
+    <div class="field" style="margin-bottom:8px">
+      <label>История матчей (последние 8)</label>
+    </div>
+    <div class="history-builder">
+      <div class="history-dots" id="historyDots"></div>
+      <div class="history-controls">
+        <button class="h-add-btn w" onclick="addHistory('W')">+ ПОБЕДА</button>
+        <button class="h-add-btn l" onclick="addHistory('L')">+ ПОРАЖЕНИЕ</button>
+        <button class="h-add-btn reset" onclick="clearHistory()">✕ СБРОСИТЬ</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Streak -->
-  <div class="streak-block">
-    <span class="streak-label">Стрик</span>
-    <div class="streak-value win-streak" id="streakVal">3🔥</div>
-    <div class="streak-text win-streak" id="streakTxt">WIN STREAK</div>
+  <!-- STREAK CARD -->
+  <div class="card" style="animation-delay:0.15s">
+    <div class="card-title">🔥 Стрик</div>
+    <div class="fields-grid" style="grid-template-columns: auto 1fr">
+      <div class="field">
+        <label>Тип</label>
+        <div class="streak-btns">
+          <button class="s-btn active-win" id="sbWin" onclick="setStreakType('win')">🔥 WIN</button>
+          <button class="s-btn" id="sbLoss" onclick="setStreakType('loss')">💀 LOSS</button>
+          <button class="s-btn" id="sbNone" onclick="setStreakType('none')">— НЕТУ</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Количество</label>
+        <input type="number" id="fStreak" value="3" min="0" max="20" oninput="updatePreview()">
+      </div>
+    </div>
   </div>
 
-  <!-- Hero -->
-  <div class="hero-block">
-    <span class="hero-label">Герой</span>
-    <div class="hero-icon" id="heroIcon">⚔️</div>
-    <div class="hero-name" id="heroName">Invoker</div>
+  <!-- HERO CARD -->
+  <div class="card" style="animation-delay:0.2s">
+    <div class="card-title">🎮 Герой</div>
+    <div class="field" style="margin-bottom: 14px">
+      <label>Имя героя</label>
+      <input type="text" id="fHero" value="Invoker" placeholder="Введи имя героя" oninput="updatePreview()">
+    </div>
+    <div class="field" style="margin-bottom: 14px">
+      <label>Эмодзи героя</label>
+      <input type="text" id="fEmoji" value="⚔️" placeholder="⚔️" oninput="updatePreview()" style="font-size:28px">
+    </div>
+    <div class="hero-picker" id="heroPicker"></div>
+  </div>
+
+  <!-- LINK BOX -->
+  <div class="link-box">
+    <div class="link-label">🔗 Ссылка для OBS Browser Source</div>
+    <div class="link-row">
+      <div class="link-text" id="linkText">legendabrat.github.io/overlay.html?mmr=3840&goal=4000...</div>
+      <button class="btn-copy" id="copyBtn" onclick="copyLink()">КОПИРОВАТЬ</button>
+      <button class="btn-open" onclick="openOverlay()">ОТКРЫТЬ</button>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions-row">
+    <button class="btn-main btn-update" onclick="applyAll()">⚡ ОБНОВИТЬ ОВЕРЛЕЙ</button>
+    <button class="btn-reset-all" onclick="resetAll()">СБРОС</button>
   </div>
 
 </div>
 
 <script>
-// ── Читаем параметры из URL ──
-const p = new URLSearchParams(location.search);
+// ── State ──
+let streakType = 'win';
+let historyArr = ['W','W','L','W','L','W']; // default
 
-const mmrCurrent = parseInt(p.get('mmr')    || 3840);
-const mmrGoal    = parseInt(p.get('goal')   || 4000);
-const mmrStart   = parseInt(p.get('start')  || 3000);
-const wins       = parseInt(p.get('wins')   || 4);
-const losses     = parseInt(p.get('losses') || 2);
-const streak     = parseInt(p.get('streak') || 3);  // + = win, - = loss, 0 = none
-const hero       = p.get('hero')  || 'Invoker';
-const heroEmoji  = p.get('emoji') || '⚔️';
-const delta      = parseInt(p.get('delta')  || 30); // +/- MMR за сессию
-
-// ── Apply values ──
-document.getElementById('mmrCurrent').textContent = mmrCurrent;
-document.getElementById('mmrGoal').textContent    = mmrGoal;
-document.getElementById('heroName').textContent   = hero;
-document.getElementById('heroIcon').textContent   = heroEmoji;
-document.getElementById('wins').textContent       = wins;
-document.getElementById('losses').textContent     = losses;
-
-// Delta
-const deltaEl = document.getElementById('mmrDelta');
-if (delta > 0) {
-  deltaEl.textContent = '+' + delta;
-  deltaEl.className = 'mmr-delta pos';
-} else if (delta < 0) {
-  deltaEl.textContent = delta;
-  deltaEl.className = 'mmr-delta neg';
-} else {
-  deltaEl.textContent = '±0';
-  deltaEl.className = 'mmr-delta zero';
-}
-
-// ── MMR Bar ──
-const range = mmrGoal - mmrStart;
-const progress = Math.max(0, Math.min(100, ((mmrCurrent - mmrStart) / range) * 100));
-const pct = Math.round(progress);
-document.getElementById('mmrPct').textContent = pct + '%';
-
-// Animate bar on load
-setTimeout(() => {
-  const bar = document.getElementById('mmrBar');
-  bar.style.width = pct + '%';
-}, 300);
-
-// ── W/L Dots ──
-const dotsEl = document.getElementById('wlDots');
-const history = p.get('history') || '';
-// e.g. history=WWLWLW
-const results = history.toUpperCase().split('').filter(c => c==='W' || c==='L');
-// Build last 8 dots
-const maxDots = 8;
-const filled = results.slice(-maxDots);
-const empty  = maxDots - filled.length;
-for (let i = 0; i < empty; i++) {
-  const d = document.createElement('div');
-  d.className = 'wl-dot empty';
-  dotsEl.appendChild(d);
-}
-filled.forEach(r => {
-  const d = document.createElement('div');
-  d.className = 'wl-dot ' + (r === 'W' ? 'w' : 'l');
-  dotsEl.appendChild(d);
-});
-
-// ── Streak ──
-const strEl  = document.getElementById('streakVal');
-const strTxt = document.getElementById('streakTxt');
-if (streak > 1) {
-  strEl.textContent = streak + '🔥';
-  strEl.className   = 'streak-value win-streak';
-  strTxt.textContent = 'WIN STREAK';
-  strTxt.className  = 'streak-text win-streak';
-} else if (streak < -1) {
-  strEl.textContent = Math.abs(streak) + '💀';
-  strEl.className   = 'streak-value loss-streak';
-  strTxt.textContent = 'LOSS STREAK';
-  strTxt.className  = 'streak-text loss-streak';
-} else {
-  strEl.textContent = '—';
-  strEl.className   = 'streak-value none';
-  strTxt.textContent = 'НЕТ СТРИКА';
-  strTxt.className  = 'streak-text none';
-}
-
-// ── Demo Alerts ──
-const alerts = [
-  { icon: '💜', text: 'НОВЫЙ ФОЛЛОВЕР!', cls: 'follow', delay: 2000 },
-  { icon: '🔥', text: '3 WIN STREAK!',   cls: 'winstreak', delay: 8000 },
-  { icon: '📈', text: 'MMR +30!',         cls: 'mmr-up', delay: 14000 },
+const heroes = [
+  { name: 'Invoker',    emoji: '🧙' },
+  { name: 'Anti-Mage',  emoji: '⚔️' },
+  { name: 'Pudge',      emoji: '🪝' },
+  { name: 'Juggernaut', emoji: '🌀' },
+  { name: 'Axe',        emoji: '🪓' },
+  { name: 'Phantom',    emoji: '👻' },
+  { name: 'Storm',      emoji: '⚡' },
+  { name: 'Doom',       emoji: '😈' },
+  { name: 'Faceless',   emoji: '👁️' },
+  { name: 'Tinker',     emoji: '🤖' },
+  { name: 'Shadow',     emoji: '🌑' },
+  { name: 'Lina',       emoji: '🔥' },
+  { name: 'CM',         emoji: '❄️' },
+  { name: 'Rubick',     emoji: '🟣' },
+  { name: 'QoP',        emoji: '💜' },
 ];
 
-function showAlert(icon, text, cls) {
-  const area = document.getElementById('alertArea');
-  const box = document.createElement('div');
-  box.className = 'alert-box';
-  box.innerHTML = `<span class="alert-icon">${icon}</span><span class="alert-text ${cls}">${text}</span>`;
-  area.prepend(box);
-  setTimeout(() => box.remove(), 5200);
+// ── Init ──
+function init() {
+  buildHeroPicker();
+  renderHistory();
+  updatePreview();
 }
 
-alerts.forEach(a => {
-  setTimeout(() => showAlert(a.icon, a.text, a.cls), a.delay);
-  // Loop demo alerts
-  setInterval(() => showAlert(a.icon, a.text, a.cls), 20000);
-});
+function buildHeroPicker() {
+  const el = document.getElementById('heroPicker');
+  heroes.forEach(h => {
+    const btn = document.createElement('button');
+    btn.className = 'hero-btn';
+    btn.textContent = h.emoji + ' ' + h.name;
+    btn.onclick = () => {
+      document.getElementById('fHero').value = h.name;
+      document.getElementById('fEmoji').value = h.emoji;
+      document.querySelectorAll('.hero-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updatePreview();
+    };
+    el.appendChild(btn);
+  });
+}
+
+// ── History ──
+function addHistory(r) {
+  historyArr.push(r);
+  if (historyArr.length > 8) historyArr.shift();
+  // Auto update wins/losses
+  const w = historyArr.filter(x=>x==='W').length;
+  const l = historyArr.filter(x=>x==='L').length;
+  document.getElementById('fWins').value = w;
+  document.getElementById('fLosses').value = l;
+  renderHistory();
+  updatePreview();
+}
+
+function clearHistory() {
+  historyArr = [];
+  renderHistory();
+  updatePreview();
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyDots');
+  el.innerHTML = '';
+  const empty = 8 - historyArr.length;
+  for (let i = 0; i < empty; i++) {
+    const d = document.createElement('div');
+    d.className = 'h-dot';
+    d.textContent = '·';
+    el.appendChild(d);
+  }
+  historyArr.forEach((r, i) => {
+    const d = document.createElement('div');
+    d.className = 'h-dot ' + (r==='W' ? 'win' : 'loss');
+    d.textContent = r;
+    d.title = 'Кликни чтобы удалить';
+    d.onclick = () => { historyArr.splice(i + empty - (8 - historyArr.length), 1); renderHistory(); updatePreview(); };
+    el.appendChild(d);
+  });
+}
+
+// ── Streak type ──
+function setStreakType(t) {
+  streakType = t;
+  document.getElementById('sbWin').className = 's-btn' + (t==='win' ? ' active-win' : '');
+  document.getElementById('sbLoss').className = 's-btn' + (t==='loss' ? ' active-loss' : '');
+  document.getElementById('sbNone').className = 's-btn' + (t==='none' ? ' active-none' : '');
+  updatePreview();
+}
+
+// ── Update Preview ──
+function updatePreview() {
+  const mmr   = parseInt(document.getElementById('fMmr').value)   || 0;
+  const goal  = parseInt(document.getElementById('fGoal').value)  || 1;
+  const start = parseInt(document.getElementById('fStart').value) || 0;
+  const delta = document.getElementById('fDelta').value || '0';
+  const wins  = parseInt(document.getElementById('fWins').value)  || 0;
+  const losses= parseInt(document.getElementById('fLosses').value)|| 0;
+  const streakN = parseInt(document.getElementById('fStreak').value) || 0;
+  const hero  = document.getElementById('fHero').value  || 'Герой';
+  const emoji = document.getElementById('fEmoji').value || '⚔️';
+
+  // MMR bar
+  const range = Math.max(1, goal - start);
+  const pct = Math.max(0, Math.min(100, Math.round(((mmr - start) / range) * 100)));
+
+  document.getElementById('pvCur').textContent  = mmr;
+  document.getElementById('pvGoal').textContent = goal;
+  document.getElementById('pvPct').textContent  = pct + '%';
+  document.getElementById('pvBar').style.width  = pct + '%';
+
+  // Delta color
+  const dEl = document.getElementById('pvDelta');
+  const dVal = parseInt(delta);
+  dEl.textContent = delta;
+  dEl.style.color = dVal > 0 ? '#00e676' : dVal < 0 ? '#ef5350' : 'rgba(255,255,255,0.3)';
+
+  // W/L
+  document.getElementById('pvWins').textContent   = wins;
+  document.getElementById('pvLosses').textContent = losses;
+
+  // Streak
+  const strEl = document.getElementById('pvStreak');
+  if (streakType === 'win' && streakN > 1) {
+    strEl.textContent = streakN + '🔥';
+    strEl.className = 'pv-streak-val win';
+  } else if (streakType === 'loss' && streakN > 1) {
+    strEl.textContent = streakN + '💀';
+    strEl.className = 'pv-streak-val loss';
+  } else {
+    strEl.textContent = '—';
+    strEl.className = 'pv-streak-val none';
+  }
+
+  // Hero
+  document.getElementById('pvHeroIcon').textContent = emoji;
+  document.getElementById('pvHeroName').textContent = hero;
+
+  // Build link
+  buildLink();
+}
+
+// ── Build link ──
+function buildLink() {
+  const mmr   = document.getElementById('fMmr').value;
+  const goal  = document.getElementById('fGoal').value;
+  const start = document.getElementById('fStart').value;
+  const delta = document.getElementById('fDelta').value;
+  const wins  = document.getElementById('fWins').value;
+  const losses= document.getElementById('fLosses').value;
+  const streakN = document.getElementById('fStreak').value;
+  const hero  = encodeURIComponent(document.getElementById('fHero').value);
+  const emoji = encodeURIComponent(document.getElementById('fEmoji').value);
+  const hist  = historyArr.join('');
+
+  const streakVal = streakType === 'win'  ?  streakN
+                  : streakType === 'loss' ? -streakN : 0;
+
+  const url = `legendabrat.github.io/overlay.html?mmr=${mmr}&goal=${goal}&start=${start}&delta=${delta}&wins=${wins}&losses=${losses}&streak=${streakVal}&hero=${hero}&emoji=${emoji}&history=${hist}`;
+
+  document.getElementById('linkText').textContent = url;
+  return 'https://' + url;
+}
+
+function applyAll() {
+  const url = buildLink();
+  // Flash button
+  const btn = document.querySelector('.btn-update');
+  btn.textContent = '✓ ОБНОВЛЕНО!';
+  btn.style.background = 'linear-gradient(135deg, #1a5c2a, #00a040)';
+  setTimeout(() => {
+    btn.textContent = '⚡ ОБНОВИТЬ ОВЕРЛЕЙ';
+    btn.style.background = '';
+  }, 1500);
+}
+
+function copyLink() {
+  const url = 'https://' + document.getElementById('linkText').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ СКОПИРОВАНО';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'КОПИРОВАТЬ';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function openOverlay() {
+  window.open('https://' + document.getElementById('linkText').textContent, '_blank');
+}
+
+function resetAll() {
+  document.getElementById('fMmr').value = 0;
+  document.getElementById('fGoal').value = 4000;
+  document.getElementById('fStart').value = 0;
+  document.getElementById('fDelta').value = '0';
+  document.getElementById('fWins').value = 0;
+  document.getElementById('fLosses').value = 0;
+  document.getElementById('fStreak').value = 0;
+  document.getElementById('fHero').value = 'Invoker';
+  document.getElementById('fEmoji').value = '⚔️';
+  historyArr = [];
+  setStreakType('none');
+  renderHistory();
+  updatePreview();
+}
+
+init();
 </script>
 </body>
 </html>

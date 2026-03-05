@@ -2,154 +2,127 @@
 <html>
 <head>
 <meta charset="UTF-8">
-
 <style>
-
-body{
-margin:0;
-background:transparent;
-font-family:Arial, sans-serif;
+body {
+  margin: 0;
+  background: transparent;
+  font-family: Arial, sans-serif;
 }
-
-.overlay{
-position:absolute;
-bottom:40px;
-left:40px;
-
-background:linear-gradient(90deg,#0b0b0f,#120b0b);
-
-border-radius:10px;
-padding:14px 22px;
-
-display:flex;
-align-items:center;
-gap:30px;
-
-color:white;
-
-box-shadow:0 0 20px rgba(255,80,0,0.15);
+.overlay {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  background: linear-gradient(90deg, #0b0b0f, #120b0b);
+  border-radius: 10px;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  color: white;
+  box-shadow: 0 0 20px rgba(255,80,0,0.15);
 }
-
-.block{
-display:flex;
-flex-direction:column;
+.block {
+  display: flex;
+  flex-direction: column;
 }
-
-.big{
-font-size:26px;
-font-weight:700;
+.big {
+  font-size: 26px;
+  font-weight: 700;
 }
-
-.green{
-color:#00ff9c;
+.green  { color: #00ff9c; }
+.red    { color: #ff5252; }
+.orange { color: #ffa726; }
+.label {
+  font-size: 12px;
+  opacity: 0.6;
 }
-
-.red{
-color:#ff5252;
+.progressbar {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 5px; width: 100%;
+  background: #1c1c22;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
 }
-
-.orange{
-color:#ffa726;
+.progress {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ffb300, #ff6f00);
+  transition: width 0.8s ease;
 }
-
-.label{
-font-size:12px;
-opacity:0.6;
-}
-
-.progressbar{
-position:absolute;
-bottom:0;
-left:0;
-
-height:5px;
-width:100%;
-
-background:#1c1c22;
-border-radius:0 0 10px 10px;
-overflow:hidden;
-}
-
-.progress{
-height:100%;
-width:50%;
-background:linear-gradient(90deg,#ffb300,#ff6f00);
-}
-
 </style>
 </head>
-
 <body>
 
 <div class="overlay">
-
-<div class="block">
-<div class="big">
-<span id="mmr">0</span>
-<span style="opacity:0.5">→</span>
-<span id="target">0</span>
-</div>
-</div>
-
-<div class="block">
-<div class="big green">
-<span id="gain">0</span>
-</div>
-</div>
-
-<div class="block">
-<div class="big orange">
-<span id="wr">0%</span>
-</div>
-</div>
-
-<div class="block">
-<div class="big">
-<span class="green" id="wins">0</span>
- /
-<span class="red" id="losses">0</span>
-</div>
-<div class="label">СЕГОДНЯ</div>
-</div>
-
-<div class="block">
-<div class="big orange">
-<span id="streak">0</span>🔥
-</div>
-<div class="label">СТРИК</div>
-</div>
-
-<div class="progressbar">
-<div class="progress" id="progress"></div>
-</div>
-
+  <div class="block">
+    <div class="big">
+      <span id="mmr">—</span>
+      <span style="opacity:0.5"> → </span>
+      <span id="target">—</span>
+    </div>
+  </div>
+  <div class="block">
+    <div class="big green">
+      <span id="gain">—</span>
+    </div>
+  </div>
+  <div class="block">
+    <div class="big orange">
+      <span id="wr">—</span>
+    </div>
+  </div>
+  <div class="block">
+    <div class="big">
+      <span class="green" id="wins">—</span>
+      <span style="opacity:0.4"> / </span>
+      <span class="red" id="losses">—</span>
+    </div>
+    <div class="label">СЕГОДНЯ</div>
+  </div>
+  <div class="block">
+    <div class="big orange">
+      <span id="streak">—</span>🔥
+    </div>
+    <div class="label">СТРИК</div>
+  </div>
+  <div class="progressbar">
+    <div class="progress" id="progress"></div>
+  </div>
 </div>
 
 <script>
+// Твой GitHub username и репозиторий
+const GITHUB_USER = 'legendabrat';
+const GITHUB_REPO = 'legendabrat.github.io'; // или название твоего репо
 
-const params = new URLSearchParams(window.location.search);
+// URL к data.json — читаем напрямую с GitHub Pages
+const DATA_URL = `https://${GITHUB_USER}.github.io/data.json`;
 
-function set(id,val){
-if(val !== null){
-document.getElementById(id).innerText = val;
-}
-}
-
-set("mmr",params.get("mmr"));
-set("target",params.get("target"));
-set("gain",params.get("gain"));
-set("wr",params.get("wr"));
-set("wins",params.get("wins"));
-set("losses",params.get("losses"));
-set("streak",params.get("streak"));
-
-const progress = params.get("progress");
-
-if(progress){
-document.getElementById("progress").style.width = progress+"%";
+function applyData(d) {
+  document.getElementById('mmr').innerText    = d.mmr    ?? '—';
+  document.getElementById('target').innerText = d.target ?? '—';
+  document.getElementById('gain').innerText   = d.gain   ?? '—';
+  document.getElementById('wr').innerText     = d.wr     ?? '—';
+  document.getElementById('wins').innerText   = d.wins   ?? '—';
+  document.getElementById('losses').innerText = d.losses ?? '—';
+  document.getElementById('streak').innerText = d.streak ?? '—';
+  document.getElementById('progress').style.width = (d.progress ?? 0) + '%';
 }
 
+function fetchData() {
+  // cache-bust чтобы браузер не кешировал старые данные
+  fetch(DATA_URL + '?t=' + Date.now())
+    .then(r => r.json())
+    .then(applyData)
+    .catch(() => {}); // молча игнорируем ошибки сети
+}
+
+// Первый запрос сразу
+fetchData();
+
+// Потом каждые 3 секунды
+setInterval(fetchData, 3000);
 </script>
-
 </body>
 </html>

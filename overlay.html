@@ -8,53 +8,126 @@
 body{
 margin:0;
 background:transparent;
-font-family:Oswald, sans-serif;
+font-family:Arial, sans-serif;
 }
 
-.bar{
+.overlay{
+
 position:absolute;
 bottom:40px;
 left:40px;
 
-background:rgba(0,0,0,0.8);
-border:1px solid rgba(192,57,43,0.5);
-border-radius:8px;
+background:linear-gradient(90deg,#0b0b0f,#120b0b);
 
-padding:10px 18px;
+border-radius:10px;
+padding:14px 22px;
+
 display:flex;
-gap:20px;
+align-items:center;
+gap:30px;
 
 color:white;
-font-size:22px;
+
+box-shadow:0 0 20px rgba(255,80,0,0.15);
 }
 
-.w{color:#00e676;}
-.l{color:#ef5350;}
+.block{
+display:flex;
+flex-direction:column;
+}
+
+.big{
+font-size:26px;
+font-weight:700;
+}
+
+.green{
+color:#00ff9c;
+}
+
+.red{
+color:#ff5252;
+}
+
+.orange{
+color:#ffa726;
+}
+
+.label{
+font-size:12px;
+opacity:0.6;
+}
+
+.progressbar{
+position:absolute;
+bottom:0;
+left:0;
+
+height:5px;
+width:100%;
+
+background:#1c1c22;
+border-radius:0 0 10px 10px;
+overflow:hidden;
+}
+
+.progress{
+
+height:100%;
+width:50%;
+
+background:linear-gradient(90deg,#ffb300,#ff6f00);
+
+}
 
 </style>
 </head>
 
 <body>
 
-<div class="bar">
+<div class="overlay">
 
-<div>
-MMR
+<div class="block">
+<div class="big">
 <span id="mmr">3840</span>
+<span style="opacity:0.5">→</span>
+<span id="target">4000</span>
+</div>
 </div>
 
-<div>
-<span class="w" id="wins">4</span>
+<div class="block">
+<div class="big green">
+<span id="gain">+30</span>
+</div>
+</div>
+
+<div class="block">
+<div class="big orange">
+<span id="wr">84%</span>
+</div>
+</div>
+
+<div class="block">
+<div class="big">
+<span class="green" id="wins">4</span>
  /
-<span class="l" id="losses">2</span>
+<span class="red" id="losses">2</span>
+</div>
+<div class="label">СЕГОДНЯ</div>
 </div>
 
-<div id="streak">
-3🔥
+<div class="block">
+<div class="big orange">
+<span id="streak">3</span>🔥
+</div>
+<div class="label">СТРИК</div>
+</div>
+
+<div class="progressbar">
+<div class="progress" id="progress"></div>
 </div>
 
 </div>
-
 
 <script>
 
@@ -67,6 +140,15 @@ const data = JSON.parse(event.data);
 if(data.mmr)
 document.getElementById("mmr").innerText = data.mmr;
 
+if(data.target)
+document.getElementById("target").innerText = data.target;
+
+if(data.gain)
+document.getElementById("gain").innerText = data.gain;
+
+if(data.wr)
+document.getElementById("wr").innerText = data.wr;
+
 if(data.wins)
 document.getElementById("wins").innerText = data.wins;
 
@@ -75,6 +157,9 @@ document.getElementById("losses").innerText = data.losses;
 
 if(data.streak)
 document.getElementById("streak").innerText = data.streak;
+
+if(data.progress)
+document.getElementById("progress").style.width = data.progress + "%";
 
 }
 

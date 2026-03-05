@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEGENDABRAT — Панель</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#07090d; color:#c8d8e8;
+  font-family:'Rajdhani',sans-serif;
+  min-height:100vh; padding:24px 16px 60px;
+}
+body::before {
+  content:''; position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse 50% 30% at 50% 0%, rgba(192,57,43,0.07) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,45,61,0.12) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,45,61,0.12) 40px);
+  pointer-events:none; z-index:0;
+}
+.wrap { max-width:600px; margin:0 auto; position:relative; z-index:1; }
+.header { text-align:center; margin-bottom:20px; }
+.header-title {
+  font-family:'Oswald',sans-serif; font-size:32px; font-weight:700;
+  letter-spacing:5px; color:#c0392b;
+  text-shadow:0 0 24px rgba(192,57,43,0.4);
+}
+.header-sub { font-size:11px; letter-spacing:3px; color:rgba(200,216,232,0.3); margin-top:4px; }
+
+/* PREVIEW */
+.preview {
+  background:linear-gradient(90deg,#0b0b0f,#120b0b);
+  border-radius:10px; padding:14px 20px;
+  display:flex; align-items:center; gap:20px;
+  margin-bottom:16px;
+  box-shadow:0 0 20px rgba(255,80,0,0.1);
+  position:relative; overflow:hidden; flex-wrap:wrap;
+}
+.pv-bar {
+  position:absolute; bottom:0; left:0; height:4px;
+  background:linear-gradient(90deg,#ffb300,#ff6f00);
+  transition:width 0.6s ease; z-index:1;
+}
+.pv-bg-bar { position:absolute; bottom:0; left:0; right:0; height:4px; background:#1c1c22; }
+.pv-block { display:flex; flex-direction:column; }
+.pv-big { font-size:20px; font-weight:700; line-height:1; }
+.pv-label { font-size:10px; opacity:0.5; margin-top:3px; letter-spacing:1px; }
+.g { color:#00ff9c; } .r { color:#ff5252; } .o { color:#ffa726; } .sep { opacity:0.3; margin:0 2px; }
+
+/* STATUS */
+.status {
+  display:flex; align-items:center; gap:8px;
+  padding:10px 14px; border-radius:6px; margin-bottom:16px;
+  font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; border:1px solid;
+}
+.status.idle   { background:rgba(30,45,61,0.3);    border-color:#1e2d3d;              color:rgba(200,216,232,0.35); }
+.status.saving { background:rgba(232,160,32,0.08); border-color:rgba(232,160,32,0.4); color:#e8a020; }
+.status.saved  { background:rgba(0,230,118,0.08);  border-color:rgba(0,230,118,0.4);  color:#00e676; }
+.status.error  { background:rgba(239,83,80,0.08);  border-color:rgba(239,83,80,0.4);  color:#ef5350; }
+.sdot { width:7px; height:7px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+/* SETUP */
+.setup {
+  background:#0f1620; border:1px solid rgba(232,160,32,0.3);
+  border-radius:10px; padding:18px; margin-bottom:14px;
+}
+.setup-title {
+  font-family:'Oswald',sans-serif; font-size:12px; letter-spacing:3px;
+  text-transform:uppercase; color:#e8a020; margin-bottom:10px;
+}
+.setup-note { font-size:12px; color:rgba(200,216,232,0.4); line-height:1.8; margin-bottom:12px; }
+.setup-note a { color:#e8a020; text-decoration:none; }
+.setup-note code { background:rgba(232,160,32,0.1); padding:1px 5px; border-radius:3px; font-size:11px; color:#e8a020; }
+
+/* CARD */
+.card { background:#111820; border:1px solid #1e2d3d; border-radius:10px; padding:18px; margin-bottom:12px; }
+.card-title {
+  font-family:'Oswald',sans-serif; font-size:12px; letter-spacing:3px;
+  text-transform:uppercase; color:rgba(192,57,43,0.8); margin-bottom:14px;
+  display:flex; align-items:center; gap:8px;
+}
+.card-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(192,57,43,0.3),transparent); }
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.field { display:flex; flex-direction:column; gap:5px; }
+.field label { font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(200,216,232,0.3); }
+.field input {
+  background:#0a1018; border:1px solid #1e2d3d; border-radius:6px;
+  color:#e8f0f8; font-family:'Oswald',sans-serif; font-size:24px; font-weight:600;
+  padding:9px 12px; width:100%; outline:none; transition:border-color 0.2s, box-shadow 0.2s;
+}
+.field input:focus { border-color:rgba(192,57,43,0.5); box-shadow:0 0 0 3px rgba(192,57,43,0.08); }
+
+/* W/L BUTTONS */
+.wl-row { display:flex; gap:8px; margin-top:10px; }
+.wbtn {
+  flex:1; padding:11px; border-radius:6px; border:1px solid #1e2d3d;
+  background:#0a1018; cursor:pointer; font-family:'Oswald',sans-serif;
+  font-size:15px; font-weight:700; letter-spacing:2px; transition:all 0.15s; text-align:center;
+}
+.wbtn.win  { color:#00e676; } .wbtn.win:hover  { background:rgba(0,230,118,0.1);  border-color:rgba(0,230,118,0.5); }
+.wbtn.loss { color:#ef5350; } .wbtn.loss:hover { background:rgba(239,83,80,0.1);  border-color:rgba(239,83,80,0.5); }
+.wbtn.undo { color:rgba(255,255,255,0.3); flex:0 0 auto; padding:11px 16px; font-size:16px; }
+.wbtn.undo:hover { color:rgba(255,255,255,0.6); border-color:rgba(255,255,255,0.2); }
+.hdots { display:flex; gap:5px; margin-top:10px; flex-wrap:wrap; }
+.hdot { width:28px; height:28px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+.hdot.w { background:rgba(0,230,118,0.15); color:#00e676; border:1px solid rgba(0,230,118,0.4); }
+.hdot.l { background:rgba(239,83,80,0.15);  color:#ef5350; border:1px solid rgba(239,83,80,0.4); }
+.hdot.e { background:rgba(255,255,255,0.03); color:rgba(255,255,255,0.12); border:1px solid #1a2535; }
+
+/* STREAK */
+.sbtns { display:flex; gap:8px; }
+.sbtn {
+  flex:1; padding:10px 6px; background:#0a1018; border:1px solid #1e2d3d;
+  border-radius:6px; cursor:pointer; font-family:'Rajdhani',sans-serif;
+  font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:rgba(200,216,232,0.35); transition:all 0.15s; text-align:center;
+}
+.sbtn.aw { background:rgba(0,230,118,0.08);   border-color:rgba(0,230,118,0.5);  color:#00e676; }
+.sbtn.al { background:rgba(239,83,80,0.08);   border-color:rgba(239,83,80,0.5);  color:#ef5350; }
+.sbtn.an { background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.5); }
+
+@keyframes fu { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.wrap>*{animation:fu 0.5s ease both;}
+.wrap>*:nth-child(2){animation-delay:.04s} .wrap>*:nth-child(3){animation-delay:.08s}
+.wrap>*:nth-child(4){animation-delay:.11s} .wrap>*:nth-child(5){animation-delay:.14s}
+.wrap>*:nth-child(6){animation-delay:.17s} .wrap>*:nth-child(7){animation-delay:.20s}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <div class="header-title">LEGENDABRAT</div>
+  <div class="header-sub">Панель управления оверлеем</div>
+</div>
+
+<!-- PREVIEW -->
+<div class="preview">
+  <div class="pv-block">
+    <div class="pv-big" style="color:#fff">
+      <span id="pvMmr">—</span><span class="sep"> → </span><span id="pvTarget" style="opacity:0.4">—</span>
+    </div>
+  </div>
+  <div class="pv-block"><div class="pv-big g" id="pvGain">—</div></div>
+  <div class="pv-block"><div class="pv-big o" id="pvWr">—</div></div>
+  <div class="pv-block">
+    <div class="pv-big"><span class="g" id="pvWins">—</span><span class="sep">/</span><span class="r" id="pvLosses">—</span></div>
+    <div class="pv-label">СЕГОДНЯ</div>
+  </div>
+  <div class="pv-block">
+    <div class="pv-big o"><span id="pvStreak">—</span>🔥</div>
+    <div class="pv-label">СТРИК</div>
+  </div>
+  <div class="pv-bg-bar"></div>
+  <div class="pv-bar" id="pvBar" style="width:0%"></div>
+</div>
+
+<!-- STATUS -->
+<div class="status idle" id="status">
+  <div class="sdot"></div>
+  <span id="statusText">Ожидание изменений...</span>
+</div>
+
+<!-- SETUP -->
+<div class="setup" id="setupCard">
+  <div class="setup-title">⚙️ Настройка — один раз</div>
+  <div class="setup-note">
+    1. Открой <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a><br>
+    2. Note: <code>overlay</code> → Expiration: <code>No expiration</code><br>
+    3. Поставь галочку <code>repo</code> → нажми <code>Generate token</code><br>
+    4. Скопируй токен и вставь сюда 👇 (сохраняется только у тебя)
+  </div>
+  <div class="field">
+    <label>GitHub Token</label>
+    <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxx" oninput="saveToken()" style="font-size:16px">
+  </div>
+</div>
+
+<!-- MMR -->
+<div class="card">
+  <div class="card-title">📊 MMR</div>
+  <div class="g3">
+    <div class="field"><label>Текущий MMR</label><input type="number" id="fMmr" value="0" oninput="onInput()"></div>
+    <div class="field"><label>Цель MMR</label><input type="number" id="fTarget" value="4000" oninput="onInput()"></div>
+    <div class="field"><label>Старт стрима</label><input type="number" id="fStart" value="0" oninput="onInput()"></div>
+  </div>
+</div>
+
+<!-- W/L -->
+<div class="card">
+  <div class="card-title">⚔️ Победы / Поражения</div>
+  <div class="g2">
+    <div class="field"><label>Победы</label><input type="number" id="fWins" value="0" min="0" oninput="onInput()"></div>
+    <div class="field"><label>Поражения</label><input type="number" id="fLosses" value="0" min="0" oninput="onInput()"></div>
+  </div>
+  <div class="wl-row">
+    <button class="wbtn win"  onclick="addResult('W')">+ ПОБЕДА</button>
+    <button class="wbtn loss" onclick="addResult('L')">+ ПОРАЖЕНИЕ</button>
+    <button class="wbtn undo" onclick="undoResult()">↩</button>
+  </div>
+  <div class="hdots" id="hDots"></div>
+</div>
+
+<!-- STREAK -->
+<div class="card">
+  <div class="card-title">🔥 Стрик</div>
+  <div class="g2">
+    <div class="field">
+      <label>Тип</label>
+      <div class="sbtns">
+        <button class="sbtn aw" id="sbW" onclick="setStreak('win')">🔥 WIN</button>
+        <button class="sbtn"    id="sbL" onclick="setStreak('loss')">💀 LOSS</button>
+        <button class="sbtn"    id="sbN" onclick="setStreak('none')">— НЕТУ</button>
+      </div>
+    </div>
+    <div class="field"><label>Кол-во</label><input type="number" id="fStreak" value="0" min="0" oninput="onInput()"></div>
+  </div>
+</div>
+
+</div>
+<script>
+const GH_USER   = 'legendabrat';
+const GH_REPO   = 'legendabrat.github.io';
+const GH_FILE   = 'data.json';
+const GH_BRANCH = 'main';
+
+let streakType = 'win';
+let history    = [];
+let saveTimer  = null;
+let fileSha    = null;
+
+function saveToken() {
+  const t = document.getElementById('ghToken').value.trim();
+  if (t) { localStorage.setItem('gh_token', t); loadFromGitHub(); }
+}
+function getToken() { return localStorage.getItem('gh_token') || ''; }
+
+function init() {
+  const t = getToken();
+  if (t) { document.getElementById('ghToken').value = t; loadFromGitHub(); }
+  renderDots(); updatePreview();
+}
+
+function loadFromGitHub() {
+  const token = getToken();
+  if (!token) return;
+  setStatus('saving', 'Загрузка данных...');
+  fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${GH_FILE}`, {
+    headers: { 'Authorization': 'token ' + token, 'Cache-Control': 'no-cache' }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.content) { setStatus('error', 'Файл data.json не найден'); return; }
+    fileSha = data.sha;
+    const d = JSON.parse(atob(data.content.replace(/\n/g,'')));
+    document.getElementById('fMmr').value    = d.mmr    ?? 0;
+    document.getElementById('fTarget').value = d.target ?? 4000;
+    document.getElementById('fStart').value  = d.start  ?? 0;
+    document.getElementById('fWins').value   = d.wins   ?? 0;
+    document.getElementById('fLosses').value = d.losses ?? 0;
+    document.getElementById('fStreak').value = Math.abs(d.streak ?? 0);
+    if ((d.streak??0) > 0) setStreak('win', false);
+    else if ((d.streak??0) < 0) setStreak('loss', false);
+    else setStreak('none', false);
+    if (d.history) history = d.history.split('').filter(c=>c==='W'||c==='L');
+    renderDots(); updatePreview();
+    setStatus('saved', '✓ Данные загружены с GitHub');
+    setTimeout(() => setStatus('idle', 'Ожидание изменений...'), 2500);
+  })
+  .catch(() => setStatus('error', 'Ошибка — проверь токен'));
+}
+
+function onInput() { updatePreview(); scheduleSave(); }
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  setStatus('saving', 'Сохраняю...');
+  saveTimer = setTimeout(saveToGitHub, 1200);
+}
+
+function buildData() {
+  const mmr    = parseInt(document.getElementById('fMmr').value)    || 0;
+  const target = parseInt(document.getElementById('fTarget').value) || 4000;
+  const start  = parseInt(document.getElementById('fStart').value)  || 0;
+  const wins   = parseInt(document.getElementById('fWins').value)   || 0;
+  const losses = parseInt(document.getElementById('fLosses').value) || 0;
+  const sn     = parseInt(document.getElementById('fStreak').value) || 0;
+  const total  = wins + losses;
+  const wr     = total > 0 ? Math.round((wins/total)*100)+'%' : '—';
+  const gain   = mmr - start;
+  const gainStr= gain > 0 ? '+'+gain : gain === 0 ? '±0' : String(gain);
+  const range  = Math.max(1, target - start);
+  const progress = Math.max(0, Math.min(100, Math.round(((mmr-start)/range)*100)));
+  const streak = streakType==='win' ? sn : streakType==='loss' ? -sn : 0;
+  return { mmr, target, start, gain:gainStr, wr, wins, losses, streak, progress, history:history.join('') };
+}
+
+function saveToGitHub() {
+  const token = getToken();
+  if (!token) { setStatus('error', 'Нет токена — введи выше'); return; }
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(buildData(), null, 2))));
+  const body = { message:'overlay update', content, branch:GH_BRANCH };
+  if (fileSha) body.sha = fileSha;
+  fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${GH_FILE}`, {
+    method:'PUT',
+    headers:{ 'Authorization':'token '+token, 'Content-Type':'application/json' },
+    body: JSON.stringify(body)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.content) {
+      fileSha = data.content.sha;
+      setStatus('saved', '✓ Сохранено — оверлей обновится через ~3 сек');
+      setTimeout(() => setStatus('idle', 'Ожидание изменений...'), 3500);
+    } else {
+      setStatus('error', '⚠ ' + (data.message||'Ошибка'));
+    }
+  })
+  .catch(() => setStatus('error', 'Ошибка сети'));
+}
+
+function setStatus(type, text) {
+  document.getElementById('status').className = 'status '+type;
+  document.getElementById('statusText').textContent = text;
+}
+
+function updatePreview() {
+  const d = buildData();
+  document.getElementById('pvMmr').textContent    = d.mmr;
+  document.getElementById('pvTarget').textContent = d.target;
+  document.getElementById('pvGain').textContent   = d.gain;
+  document.getElementById('pvWr').textContent     = d.wr;
+  document.getElementById('pvWins').textContent   = d.wins;
+  document.getElementById('pvLosses').textContent = d.losses;
+  document.getElementById('pvStreak').textContent = Math.abs(d.streak)||'—';
+  document.getElementById('pvBar').style.width    = d.progress+'%';
+}
+
+function addResult(r) {
+  history.push(r);
+  if (history.length > 8) history.shift();
+  const id = r==='W' ? 'fWins' : 'fLosses';
+  document.getElementById(id).value = parseInt(document.getElementById(id).value||0)+1;
+  renderDots(); onInput();
+}
+
+function undoResult() {
+  if (!history.length) return;
+  const last = history.pop();
+  const id = last==='W' ? 'fWins' : 'fLosses';
+  document.getElementById(id).value = Math.max(0, parseInt(document.getElementById(id).value||0)-1);
+  renderDots(); onInput();
+}
+
+function renderDots() {
+  const el = document.getElementById('hDots');
+  el.innerHTML = '';
+  for (let i=0; i<8-history.length; i++) {
+    const d=document.createElement('div'); d.className='hdot e'; d.textContent='·'; el.appendChild(d);
+  }
+  history.forEach(r => {
+    const d=document.createElement('div'); d.className='hdot '+(r==='W'?'w':'l'); d.textContent=r; el.appendChild(d);
+  });
+}
+
+function setStreak(t, save=true) {
+  streakType=t;
+  document.getElementById('sbW').className='sbtn'+(t==='win'?' aw':'');
+  document.getElementById('sbL').className='sbtn'+(t==='loss'?' al':'');
+  document.getElementById('sbN').className='sbtn'+(t==='none'?' an':'');
+  if(save) onInput();
+}
+
+init();
+</script>
+</body>
+</html>

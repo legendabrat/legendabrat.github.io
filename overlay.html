@@ -51,20 +51,31 @@ body {
   text-align: center;
 }
 
-/* Маленький процент */
+/* Маленький процент — ещё меньше */
 .num-sm {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1;
   text-align: center;
 }
 
-/* Подпись под цифрами */
+/* Подпись под цифрами — базовая */
 .lbl {
   font-size: 9px;
   opacity: 0.45;
   margin-top: 5px;
   letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Подпись для winrate блока — чуть меньше */
+.lbl-sm {
+  font-size: 7.5px;
+  opacity: 0.4;
+  margin-top: 5px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
   text-align: center;
   line-height: 1.5;
@@ -130,12 +141,12 @@ body {
     <div class="mmr-row">
       <div class="mmr-cur-wrap">
         <div class="num white" id="mmr">—</div>
-        <div class="lbl">ТЕКУЩИЙ<br>MMR</div>
+        <div class="lbl">MMR</div>
       </div>
       <div class="arrow">→</div>
       <div class="mmr-goal-wrap">
         <div class="num dim" id="target">—</div>
-        <div class="lbl">ЦЕЛЬ<br>MMR</div>
+        <div class="lbl">ЦЕЛЬ</div>
       </div>
     </div>
   </div>
@@ -157,15 +168,15 @@ body {
   <!-- 3. Винрейт -->
   <div class="block">
     <div class="num-sm orange" id="wr">—</div>
-    <div class="lbl">WINRATE<br>СЕГОДНЯ</div>
+    <div class="lbl-sm">WINRATE<br>СЕГОДНЯ</div>
   </div>
 
   <div class="sep"></div>
 
-  <!-- 4. За стрим -->
+  <!-- 4. Сейчас -->
   <div class="block">
     <div class="num green" id="gain">—</div>
-    <div class="lbl">ЗА<br>СТРИМ</div>
+    <div class="lbl">СЕЙЧАС</div>
   </div>
 
   <div class="sep"></div>

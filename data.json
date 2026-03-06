@@ -1,12 +1,12 @@
 {
   "mmr": 5300,
-  "target": 5500,
+  "target": 6500,
   "start": 0,
   "gain": "+5300",
   "wr": "—",
   "wins": 0,
   "losses": 0,
   "streak": 0,
-  "progress": 96,
+  "progress": 82,
   "history": ""
 }

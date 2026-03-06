@@ -14,10 +14,10 @@ body {
   left: 40px;
   background: linear-gradient(90deg, #0b0b0f, #120b0b);
   border-radius: 10px;
-  padding: 14px 22px;
+  padding: 14px 22px 18px;
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 24px;
   color: white;
   box-shadow: 0 0 20px rgba(255,80,0,0.15);
 }
@@ -28,18 +28,48 @@ body {
 .big {
   font-size: 26px;
   font-weight: 700;
+  line-height: 1;
 }
 .green  { color: #00ff9c; }
 .red    { color: #ff5252; }
 .orange { color: #ffa726; }
 .label {
-  font-size: 12px;
-  opacity: 0.6;
+  font-size: 11px;
+  opacity: 0.55;
+  margin-top: 4px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+.sep {
+  width: 1px;
+  height: 34px;
+  background: rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+/* MMR блок — две подписи под цифрами */
+.mmr-labels {
+  display: flex;
+  gap: 0;
+  margin-top: 4px;
+}
+.mmr-label-cur {
+  font-size: 11px;
+  opacity: 0.45;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  min-width: 110px;
+}
+.mmr-label-goal {
+  font-size: 11px;
+  opacity: 0.45;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 .progressbar {
   position: absolute;
   bottom: 0; left: 0;
-  height: 5px; width: 100%;
+  height: 4px; width: 100%;
   background: #1c1c22;
   border-radius: 0 0 10px 10px;
   overflow: hidden;
@@ -55,73 +85,85 @@ body {
 <body>
 
 <div class="overlay">
+
+  <!-- 1. Текущий MMR → Цель MMR -->
   <div class="block">
     <div class="big">
       <span id="mmr">—</span>
-      <span style="opacity:0.5"> → </span>
-      <span id="target">—</span>
+      <span style="opacity:0.35; font-size:18px; margin:0 4px">→</span>
+      <span id="target" style="opacity:0.5">—</span>
+    </div>
+    <div class="mmr-labels">
+      <span class="mmr-label-cur">ТЕКУЩИЙ MMR</span>
+      <span class="mmr-label-goal">ЦЕЛЬ MMR</span>
     </div>
   </div>
-  <div class="block">
-    <div class="big green">
-      <span id="gain">—</span>
-    </div>
-  </div>
-  <div class="block">
-    <div class="big orange">
-      <span id="wr">—</span>
-    </div>
-  </div>
+
+  <div class="sep"></div>
+
+  <!-- 2. W/L + СЕГОДНЯ -->
   <div class="block">
     <div class="big">
       <span class="green" id="wins">—</span>
-      <span style="opacity:0.4"> / </span>
+      <span style="opacity:0.3; margin:0 2px">/</span>
       <span class="red" id="losses">—</span>
     </div>
     <div class="label">СЕГОДНЯ</div>
   </div>
+
+  <div class="sep"></div>
+
+  <!-- 3. Винрейт + WINRATE / СЕГОДНЯ -->
   <div class="block">
-    <div class="big orange">
-      <span id="streak">—</span>🔥
-    </div>
+    <div class="big orange" id="wr">—</div>
+    <div class="label">WINRATE<br>СЕГОДНЯ</div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- 4. +MMR за стрим -->
+  <div class="block">
+    <div class="big green" id="gain">—</div>
+    <div class="label">ЗА СТРИМ</div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- 5. Стрик -->
+  <div class="block">
+    <div class="big orange"><span id="streak">—</span>🔥</div>
     <div class="label">СТРИК</div>
   </div>
+
   <div class="progressbar">
     <div class="progress" id="progress"></div>
   </div>
+
 </div>
 
 <script>
-// Твой GitHub username и репозиторий
 const GITHUB_USER = 'legendabrat';
-const GITHUB_REPO = 'legendabrat.github.io'; // или название твоего репо
-
-// URL к data.json — читаем напрямую с GitHub Pages
 const DATA_URL = `https://${GITHUB_USER}.github.io/data.json`;
 
 function applyData(d) {
   document.getElementById('mmr').innerText    = d.mmr    ?? '—';
   document.getElementById('target').innerText = d.target ?? '—';
-  document.getElementById('gain').innerText   = d.gain   ?? '—';
-  document.getElementById('wr').innerText     = d.wr     ?? '—';
   document.getElementById('wins').innerText   = d.wins   ?? '—';
   document.getElementById('losses').innerText = d.losses ?? '—';
-  document.getElementById('streak').innerText = d.streak ?? '—';
+  document.getElementById('wr').innerText     = d.wr     ?? '—';
+  document.getElementById('gain').innerText   = d.gain   ?? '—';
+  document.getElementById('streak').innerText = Math.abs(d.streak ?? 0) || '—';
   document.getElementById('progress').style.width = (d.progress ?? 0) + '%';
 }
 
 function fetchData() {
-  // cache-bust чтобы браузер не кешировал старые данные
   fetch(DATA_URL + '?t=' + Date.now())
     .then(r => r.json())
     .then(applyData)
-    .catch(() => {}); // молча игнорируем ошибки сети
+    .catch(() => {});
 }
 
-// Первый запрос сразу
 fetchData();
-
-// Потом каждые 3 секунды
 setInterval(fetchData, 3000);
 </script>
 </body>

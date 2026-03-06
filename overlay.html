@@ -8,69 +8,105 @@ body {
   background: transparent;
   font-family: Arial, sans-serif;
 }
+
 .overlay {
   position: absolute;
   bottom: 40px;
   left: 40px;
   background: linear-gradient(90deg, #0b0b0f, #120b0b);
   border-radius: 10px;
-  padding: 14px 22px 18px;
+  padding: 12px 20px 16px;
   display: flex;
-  align-items: center;
-  gap: 24px;
+  align-items: stretch;
+  gap: 0;
   color: white;
   box-shadow: 0 0 20px rgba(255,80,0,0.15);
 }
+
+/* Каждый блок одинаковой структуры */
 .block {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
 }
-.big {
-  font-size: 26px;
+
+/* Разделитель */
+.sep {
+  width: 1px;
+  background: rgba(255,255,255,0.07);
+  align-self: stretch;
+  margin: 4px 0;
+}
+
+/* Цифры */
+.num {
+  font-size: 24px;
   font-weight: 700;
   line-height: 1;
+  text-align: center;
 }
+
+/* Маленький процент */
+.num-sm {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+/* Подпись под цифрами */
+.lbl {
+  font-size: 9px;
+  opacity: 0.45;
+  margin-top: 5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.5;
+}
+
 .green  { color: #00ff9c; }
 .red    { color: #ff5252; }
 .orange { color: #ffa726; }
-.label {
-  font-size: 11px;
-  opacity: 0.55;
-  margin-top: 4px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  line-height: 1.4;
+.white  { color: #ffffff; }
+.dim    { opacity: 0.38; }
+
+/* Стрелка MMR */
+.arrow {
+  font-size: 14px;
+  opacity: 0.3;
+  margin: 0 8px;
+  align-self: center;
 }
-.sep {
-  width: 1px;
-  height: 34px;
-  background: rgba(255,255,255,0.08);
-  flex-shrink: 0;
-}
-/* MMR блок — две подписи под цифрами */
-.mmr-labels {
+
+/* MMR блок — горизонтально с двумя подписями */
+.mmr-block {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px;
+}
+.mmr-row {
+  display: flex;
+  align-items: center;
   gap: 0;
-  margin-top: 4px;
 }
-.mmr-label-cur {
-  font-size: 11px;
-  opacity: 0.45;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  min-width: 110px;
+.mmr-cur-wrap, .mmr-goal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.mmr-label-goal {
-  font-size: 11px;
-  opacity: 0.45;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
+.mmr-cur-wrap { min-width: 68px; }
+.mmr-goal-wrap { min-width: 68px; }
+
+/* Полоска прогресса */
 .progressbar {
   position: absolute;
   bottom: 0; left: 0;
-  height: 4px; width: 100%;
-  background: #1c1c22;
+  height: 3px; width: 100%;
+  background: #1a1a20;
   border-radius: 0 0 10px 10px;
   overflow: hidden;
 }
@@ -84,55 +120,57 @@ body {
 </head>
 <body>
 
-<div class="overlay">
+<div class="overlay" style="position:relative">
 
   <!-- 1. Текущий MMR → Цель MMR -->
-  <div class="block">
-    <div class="big">
-      <span id="mmr">—</span>
-      <span style="opacity:0.35; font-size:18px; margin:0 4px">→</span>
-      <span id="target" style="opacity:0.5">—</span>
-    </div>
-    <div class="mmr-labels">
-      <span class="mmr-label-cur">ТЕКУЩИЙ MMR</span>
-      <span class="mmr-label-goal">ЦЕЛЬ MMR</span>
+  <div class="mmr-block">
+    <div class="mmr-row">
+      <div class="mmr-cur-wrap">
+        <div class="num white" id="mmr">—</div>
+        <div class="lbl">ТЕКУЩИЙ<br>MMR</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="mmr-goal-wrap">
+        <div class="num dim" id="target">—</div>
+        <div class="lbl">ЦЕЛЬ<br>MMR</div>
+      </div>
     </div>
   </div>
 
   <div class="sep"></div>
 
-  <!-- 2. W/L + СЕГОДНЯ -->
+  <!-- 2. W/L Сегодня -->
   <div class="block">
-    <div class="big">
+    <div class="num">
       <span class="green" id="wins">—</span>
-      <span style="opacity:0.3; margin:0 2px">/</span>
+      <span style="opacity:0.25; margin:0 3px; font-size:18px">/</span>
       <span class="red" id="losses">—</span>
     </div>
-    <div class="label">СЕГОДНЯ</div>
+    <div class="lbl">СЕГОДНЯ</div>
   </div>
 
   <div class="sep"></div>
 
-  <!-- 3. Винрейт + WINRATE / СЕГОДНЯ -->
+  <!-- 3. Винрейт -->
   <div class="block">
-    <div class="big orange" id="wr">—</div>
-    <div class="label">WINRATE<br>СЕГОДНЯ</div>
+    <div class="num-sm orange" id="wr">—</div>
+    <div class="lbl">WINRATE<br>СЕГОДНЯ</div>
   </div>
 
   <div class="sep"></div>
 
-  <!-- 4. +MMR за стрим -->
+  <!-- 4. За стрим -->
   <div class="block">
-    <div class="big green" id="gain">—</div>
-    <div class="label">ЗА СТРИМ</div>
+    <div class="num green" id="gain">—</div>
+    <div class="lbl">ЗА<br>СТРИМ</div>
   </div>
 
   <div class="sep"></div>
 
   <!-- 5. Стрик -->
   <div class="block">
-    <div class="big orange"><span id="streak">—</span>🔥</div>
-    <div class="label">СТРИК</div>
+    <div class="num orange"><span id="streak">—</span>🔥</div>
+    <div class="lbl">СТРИК</div>
   </div>
 
   <div class="progressbar">
@@ -146,13 +184,13 @@ const GITHUB_USER = 'legendabrat';
 const DATA_URL = `https://${GITHUB_USER}.github.io/data.json`;
 
 function applyData(d) {
-  document.getElementById('mmr').innerText    = d.mmr    ?? '—';
-  document.getElementById('target').innerText = d.target ?? '—';
-  document.getElementById('wins').innerText   = d.wins   ?? '—';
-  document.getElementById('losses').innerText = d.losses ?? '—';
-  document.getElementById('wr').innerText     = d.wr     ?? '—';
-  document.getElementById('gain').innerText   = d.gain   ?? '—';
-  document.getElementById('streak').innerText = Math.abs(d.streak ?? 0) || '—';
+  document.getElementById('mmr').innerText     = d.mmr    ?? '—';
+  document.getElementById('target').innerText  = d.target ?? '—';
+  document.getElementById('wins').innerText    = d.wins   ?? '—';
+  document.getElementById('losses').innerText  = d.losses ?? '—';
+  document.getElementById('wr').innerText      = d.wr     ?? '—';
+  document.getElementById('gain').innerText    = d.gain   ?? '—';
+  document.getElementById('streak').innerText  = Math.abs(d.streak ?? 0) || '—';
   document.getElementById('progress').style.width = (d.progress ?? 0) + '%';
 }
 

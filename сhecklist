@@ -1,24 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>База дня — Deadlock</title>
 <style>
-.wrap{padding:1rem 0;font-family:var(--font-sans);}
-.top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
-.ttl{font-size:22px;font-weight:500;color:var(--color-text-primary);}
-.cnt{font-size:13px;color:var(--color-text-secondary);}
-.bar{height:3px;background:var(--color-border-tertiary);border-radius:2px;margin-bottom:1.5rem;overflow:hidden;}
-.bar-fill{height:100%;background:var(--color-text-info);border-radius:2px;transition:width .25s;}
-.item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
-.item:hover{border-color:var(--color-border-secondary);}
-.item.done{opacity:.4;}
-.item.done .itxt{text-decoration:line-through;}
-.box{width:20px;height:20px;border:0.5px solid var(--color-border-primary);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s;}
-.item.done .box{background:var(--color-background-info);border-color:var(--color-border-info);color:var(--color-text-info);}
-.num{font-size:13px;color:var(--color-text-secondary);min-width:18px;font-family:var(--font-mono);}
-.itxt{font-size:15px;color:var(--color-text-primary);}
-.bot{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary);}
-.rst{font-size:12px;color:var(--color-text-secondary);background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:5px 14px;cursor:pointer;}
-.rst:hover{border-color:var(--color-border-secondary);}
-.date{font-size:12px;color:var(--color-text-secondary);}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0f0f0f;
+  color: #e8e8e8;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.wrap {
+  width: 100%;
+  max-width: 480px;
+}
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.ttl {
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
+}
+.cnt {
+  font-size: 13px;
+  color: #888;
+}
+.bar {
+  height: 3px;
+  background: #2a2a2a;
+  border-radius: 2px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 2px;
+  transition: width .25s;
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color .15s;
+  user-select: none;
+}
+.item:hover { border-color: #444; }
+.item.done { opacity: .4; }
+.item.done .itxt { text-decoration: line-through; }
+.box {
+  width: 22px;
+  height: 22px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: transparent;
+  transition: all .15s;
+}
+.item.done .box {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+.num {
+  font-size: 13px;
+  color: #555;
+  min-width: 18px;
+  font-family: monospace;
+}
+.itxt {
+  font-size: 15px;
+  color: #e8e8e8;
+}
+.bot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a2a;
+}
+.rst {
+  font-size: 12px;
+  color: #888;
+  background: none;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.rst:hover { border-color: #444; color: #ccc; }
+.date { font-size: 12px; color: #555; }
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <div class="top">
     <div class="ttl">База дня</div>
@@ -42,31 +138,33 @@
 
 <script>
 const d = new Date();
-document.getElementById('dt').textContent = d.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+document.getElementById('dt').textContent = d.toLocaleDateString('ru-RU', {weekday:'long', day:'numeric', month:'long'});
 
-function tap(el){
+function tap(el) {
   el.classList.toggle('done');
   upd(); save();
 }
-function upd(){
-  const all=document.querySelectorAll('.item');
-  const done=document.querySelectorAll('.item.done');
-  document.getElementById('cnt').textContent=done.length+' / '+all.length;
-  document.getElementById('fill').style.width=Math.round(done.length/all.length*100)+'%';
+function upd() {
+  const all = document.querySelectorAll('.item');
+  const done = document.querySelectorAll('.item.done');
+  document.getElementById('cnt').textContent = done.length + ' / ' + all.length;
+  document.getElementById('fill').style.width = Math.round(done.length / all.length * 100) + '%';
 }
-function save(){
-  const s=Array.from(document.querySelectorAll('.item')).map(i=>i.classList.contains('done'));
-  try{localStorage.setItem('base_cl',JSON.stringify(s));}catch(e){}
+function save() {
+  const s = Array.from(document.querySelectorAll('.item')).map(i => i.classList.contains('done'));
+  try { localStorage.setItem('base_cl', JSON.stringify(s)); } catch(e) {}
 }
-function reset(){
-  document.querySelectorAll('.item').forEach(i=>i.classList.remove('done'));
+function reset() {
+  document.querySelectorAll('.item').forEach(i => i.classList.remove('done'));
   upd(); save();
 }
-(function load(){
-  try{
-    const s=JSON.parse(localStorage.getItem('base_cl')||'[]');
-    document.querySelectorAll('.item').forEach((el,i)=>{if(s[i])el.classList.add('done');});
-  }catch(e){}
+(function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem('base_cl') || '[]');
+    document.querySelectorAll('.item').forEach((el, i) => { if (s[i]) el.classList.add('done'); });
+  } catch(e) {}
   upd();
 })();
 </script>
+</body>
+</html>

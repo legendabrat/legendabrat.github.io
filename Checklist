@@ -1,0 +1,72 @@
+<style>
+.wrap{padding:1rem 0;font-family:var(--font-sans);}
+.top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+.ttl{font-size:22px;font-weight:500;color:var(--color-text-primary);}
+.cnt{font-size:13px;color:var(--color-text-secondary);}
+.bar{height:3px;background:var(--color-border-tertiary);border-radius:2px;margin-bottom:1.5rem;overflow:hidden;}
+.bar-fill{height:100%;background:var(--color-text-info);border-radius:2px;transition:width .25s;}
+.item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
+.item:hover{border-color:var(--color-border-secondary);}
+.item.done{opacity:.4;}
+.item.done .itxt{text-decoration:line-through;}
+.box{width:20px;height:20px;border:0.5px solid var(--color-border-primary);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s;}
+.item.done .box{background:var(--color-background-info);border-color:var(--color-border-info);color:var(--color-text-info);}
+.num{font-size:13px;color:var(--color-text-secondary);min-width:18px;font-family:var(--font-mono);}
+.itxt{font-size:15px;color:var(--color-text-primary);}
+.bot{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary);}
+.rst{font-size:12px;color:var(--color-text-secondary);background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:5px 14px;cursor:pointer;}
+.rst:hover{border-color:var(--color-border-secondary);}
+.date{font-size:12px;color:var(--color-text-secondary);}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="ttl">База дня</div>
+    <div class="cnt" id="cnt">0 / 7</div>
+  </div>
+  <div class="bar"><div class="bar-fill" id="fill" style="width:0%"></div></div>
+
+  <div class="item" onclick="tap(this)"><div class="box">✓</div><div class="num">1</div><div class="itxt">Анонс стрима в Telegram</div></div>
+  <div class="item" onclick="tap(this)"><div class="box">✓</div><div class="num">2</div><div class="itxt">Заголовок на Twitch выставлен</div></div>
+  <div class="item" onclick="tap(this)"><div class="box">✓</div><div class="num">3</div><div class="itxt">OBS проверен — звук, оверлей</div></div>
+  <div class="item" onclick="tap(this)"><div class="box">✓</div><div class="num">4</div><div class="itxt">Стрим отыгран</div></div>
+  <div class="item" onclick="tap(this)"><div class="box">✓</div><div class="num">5</div><div class="itxt">Клипы нарезаны после стрима</div></div>
+  <div class="item" onclick="tap(this)"><div class="box">✓</div><div class="num">6</div><div class="itxt">1 Short загружен</div></div>
+  <div class="item" onclick="tap(this)"><div class="box">✓</div><div class="num">7</div><div class="itxt">Рейд сделан</div></div>
+
+  <div class="bot">
+    <div class="date" id="dt"></div>
+    <button class="rst" onclick="reset()">↺ новый день</button>
+  </div>
+</div>
+
+<script>
+const d = new Date();
+document.getElementById('dt').textContent = d.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+
+function tap(el){
+  el.classList.toggle('done');
+  upd(); save();
+}
+function upd(){
+  const all=document.querySelectorAll('.item');
+  const done=document.querySelectorAll('.item.done');
+  document.getElementById('cnt').textContent=done.length+' / '+all.length;
+  document.getElementById('fill').style.width=Math.round(done.length/all.length*100)+'%';
+}
+function save(){
+  const s=Array.from(document.querySelectorAll('.item')).map(i=>i.classList.contains('done'));
+  try{localStorage.setItem('base_cl',JSON.stringify(s));}catch(e){}
+}
+function reset(){
+  document.querySelectorAll('.item').forEach(i=>i.classList.remove('done'));
+  upd(); save();
+}
+(function load(){
+  try{
+    const s=JSON.parse(localStorage.getItem('base_cl')||'[]');
+    document.querySelectorAll('.item').forEach((el,i)=>{if(s[i])el.classList.add('done');});
+  }catch(e){}
+  upd();
+})();
+</script>
